@@ -1,0 +1,7 @@
+
+> server@1.0.0 start
+> node server.js
+
+[dotenv@17.2.3] injecting env (1) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+Database synced successfully
+Server running on port 3000
