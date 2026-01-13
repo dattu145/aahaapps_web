@@ -16,7 +16,7 @@ const SortableThumbnail = ({ url, onRemove }) => {
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative group w-20 h-20 cursor-move">
-            <img src={`http://localhost:5000/${url}`} alt="Thumbnail" className="w-full h-full object-cover rounded border border-gray-200" />
+            <img src={`/${url}`} alt="Thumbnail" className="w-full h-full object-cover rounded border border-gray-200" />
             <button
                 type="button"
                 onPointerDown={(e) => e.stopPropagation()} // Prevent drag start when clicking delete
@@ -251,7 +251,7 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                     {(newSection2Image || formData.section2_image) && (
                         <div className="mt-4 h-48 w-full bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
                             <img
-                                src={newSection2Image ? URL.createObjectURL(newSection2Image) : `http://localhost:5000/${formData.section2_image}`}
+                                src={newSection2Image ? URL.createObjectURL(newSection2Image) : `/${formData.section2_image}`}
                                 alt="Preview"
                                 className="h-full object-contain"
                             />

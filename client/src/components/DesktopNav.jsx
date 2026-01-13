@@ -104,7 +104,7 @@ const DesktopNav = () => {
                     <div className="flex items-center justify-center h-full">
                         {settings.site_logo && (
                             <img
-                                src={`http://localhost:5000/${settings.site_logo}`}
+                                src={`/${settings.site_logo}`}
                                 alt="Logo"
                                 className="h-12 object-contain max-w-[200px]"
                             />

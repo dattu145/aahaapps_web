@@ -48,7 +48,7 @@ const PublicCard = ({ card, index = 0 }) => {
                                 onClick={() => openGallery(idx)}
                                 className="aspect-[4/3] overflow-hidden rounded-lg cursor-pointer hover:opacity-80 transition border border-transparent hover:border-blue-500 shadow-sm"
                             >
-                                <img src={`http://localhost:5000/${img}`} className="w-full h-full object-cover" loading="lazy" />
+                                <img src={`/${img}`} className="w-full h-full object-cover" loading="lazy" />
                             </div>
                         ))}
                     </div>
@@ -57,7 +57,7 @@ const PublicCard = ({ card, index = 0 }) => {
                     <div className="col-span-6 relative group overflow-hidden bg-gray-50 flex items-center justify-center p-4">
                         {card.section2_image ? (
                             <img
-                                src={`http://localhost:5000/${card.section2_image}`}
+                                src={`/${card.section2_image}`}
                                 className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
                                 alt={card.title}
                             />
@@ -115,7 +115,7 @@ const PublicCard = ({ card, index = 0 }) => {
                                 onClick={() => openGallery(idx)}
                                 className="flex-shrink-0 w-24 h-20 rounded-lg overflow-hidden cursor-pointer border border-gray-200 shadow-sm"
                             >
-                                <img src={`http://localhost:5000/${img}`} className="w-full h-full object-cover" />
+                                <img src={`/${img}`} className="w-full h-full object-cover" />
                             </div>
                         ))}
                     </div>
@@ -123,7 +123,7 @@ const PublicCard = ({ card, index = 0 }) => {
                     {/* 2. Main Image */}
                     <div className="aspect-video w-full bg-gray-50 relative p-2">
                         {card.section2_image && (
-                            <img src={`http://localhost:5000/${card.section2_image}`} className="w-full h-full object-contain" />
+                            <img src={`/${card.section2_image}`} className="w-full h-full object-contain" />
                         )}
                     </div>
 
@@ -159,7 +159,7 @@ const PublicCard = ({ card, index = 0 }) => {
 
                     <div className="relative w-full max-w-5xl aspect-video flex items-center justify-center">
                         <img
-                            src={`http://localhost:5000/${section1Images[currentImageIndex]}`}
+                            src={`/${section1Images[currentImageIndex]}`}
                             className="max-h-full max-w-full object-contain rounded-lg shadow-2xl"
                         />
 
@@ -183,7 +183,7 @@ const PublicCard = ({ card, index = 0 }) => {
                                 onClick={() => setCurrentImageIndex(idx)}
                                 className={`w-12 h-12 rounded overflow-hidden border-2 transition ${currentImageIndex === idx ? 'border-white scale-110' : 'border-transparent opacity-50'}`}
                             >
-                                <img src={`http://localhost:5000/${img}`} className="w-full h-full object-cover" />
+                                <img src={`/${img}`} className="w-full h-full object-cover" />
                             </button>
                         ))}
                     </div>

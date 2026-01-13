@@ -138,7 +138,7 @@ const CardManager = () => {
                                 <td className="py-4 px-6">
                                     <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden border border-gray-200">
                                         {card.section2_image ? (
-                                            <img src={`http://localhost:5000/${card.section2_image}`} className="w-full h-full object-cover" />
+                                            <img src={`/${card.section2_image}`} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">IMG</div>
                                         )}

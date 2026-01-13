@@ -43,7 +43,7 @@ const MobileNav = () => {
                 <div className="pointer-events-auto">
                     {settings.site_logo && (
                         <img
-                            src={`http://localhost:5000/${settings.site_logo}`}
+                            src={`/${settings.site_logo}`}
                             alt="Logo"
                             className="h-10 object-contain drop-shadow-md"
                         />

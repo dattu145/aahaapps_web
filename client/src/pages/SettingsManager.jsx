@@ -167,7 +167,7 @@ const SettingsManager = () => {
                 <div className="bg-white p-8 rounded-lg shadow-sm">
                     <h3 className="text-gray-700 font-semibold mb-4">Current Active Logo</h3>
                     <div className="bg-[#1a1f2e] p-4 rounded inline-block">
-                        <img src={`http://localhost:5000/${settings.site_logo}`} alt="Active Logo" className="h-16 object-contain" />
+                        <img src={`/${settings.site_logo}`} alt="Active Logo" className="h-16 object-contain" />
                     </div>
                 </div>
             )}
