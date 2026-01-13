@@ -11,6 +11,15 @@ const cardRoutes = require('./routes/cardRoutes');
 const settingRoutes = require('./routes/settingRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 const userRoutes = require('./routes/userRoutes');
+const fs = require('fs');
+const path = require('path');
+
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('Created uploads directory');
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,7 +39,7 @@ app.use('/api/pages', require('./routes/pageRoutes'));
 app.use('/api/database', require('./routes/databaseRoutes'));
 
 // Serve static files from client build
-const path = require('path');
+// Serve static files from client build
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Catch-all route to serve React App
