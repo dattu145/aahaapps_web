@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import api from '../api';
 import { Menu as MenuIcon, X, Globe, Mail, Linkedin } from 'lucide-react'; // Added Linkedin
 import { Link } from 'react-router-dom';
@@ -16,7 +17,13 @@ const MobileNav = () => {
                     api.get('/settings')
                 ]);
                 setMenus(menuRes.data.filter(m => m.is_active));
-                setSettings(settingRes.data);
+
+                // Parse booleans
+                const s = settingRes.data;
+                s.show_menu = s.show_menu !== 'false';
+                s.show_logo = s.show_logo !== 'false';
+
+                setSettings(s);
             } catch (e) { console.error(e); }
         };
         fetchData();
@@ -32,10 +39,11 @@ const MobileNav = () => {
         return () => { document.body.style.overflow = 'unset'; };
     }, [isOpen]);
 
-    return (
+    // Use Portal to render outside of efficient React tree (directly in body) to avoid Stacking Context issues
+    return createPortal(
         <>
             {/* Mobile Header Bar (Visible when menu closed) */}
-            <div className="fixed top-0 left-0 right-0 z-40 p-6 flex justify-between items-center bg-transparent pointer-events-none">
+            <div className="lg:hidden fixed top-0 left-0 right-0 z-[9999] p-6 flex justify-between items-center bg-transparent pointer-events-none">
                 {/* 
                     NOTE: Using pointer-events-none on container so clicks pass through to video/content if transparent.
                     But the buttons need pointer-events-auto.
@@ -50,7 +58,7 @@ const MobileNav = () => {
                     )}
                 </div>
 
-                {/* Hamburger Trigger */}
+                {/* Hamburger Trigger - Always Visible */}
                 <button
                     onClick={() => setIsOpen(true)}
                     className="pointer-events-auto bg-white/90 backdrop-blur shadow-sm p-3 rounded-full text-black hover:bg-black hover:text-white transition-colors"
@@ -61,13 +69,13 @@ const MobileNav = () => {
 
             {/* Drawer Overlay (Backdrop) */}
             <div
-                className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                className={`lg:hidden fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setIsOpen(false)}
             />
 
             {/* Side Drawer Menu */}
             <div
-                className={`fixed inset-y-0 right-0 z-50 w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`lg:hidden fixed inset-y-0 right-0 z-[10000] w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header: Menu Title & Close */}
@@ -154,7 +162,8 @@ const MobileNav = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </>,
+        document.body
     );
 };
 

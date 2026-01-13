@@ -116,8 +116,17 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
 
     const handleSection1ImagesChange = (e) => {
         if (e.target.files) {
-            setNewSection1Images(Array.from(e.target.files));
+            // Append new files instead of replacing, if that's desired behavior, or just replace.
+            // Standard file input behavior replaces. Here we'll stick to replacing "current selection" 
+            // but we might want to accumulate if the user wants to add more?
+            // User request implies "remove selected", suggesting they might want to manage this list.
+            // Let's create an array from the FileList.
+            setNewSection1Images(prev => [...prev, ...Array.from(e.target.files)]);
         }
+    };
+
+    const removeNewImage = (index) => {
+        setNewSection1Images(prev => prev.filter((_, i) => i !== index));
     };
 
     const removeExistingImage = (imagePath) => {
@@ -208,8 +217,15 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                     {newSection1Images.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-3">
                             {newSection1Images.map((file, idx) => (
-                                <div key={`new-${idx}`} className="w-16 h-16 relative">
+                                <div key={`new-${idx}`} className="w-16 h-16 relative group">
                                     <img src={URL.createObjectURL(file)} alt="New upload" className="w-full h-full object-cover rounded border-2 border-green-400" />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeNewImage(idx)}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-sm"
+                                    >
+                                        <X size={12} />
+                                    </button>
                                 </div>
                             ))}
                         </div>

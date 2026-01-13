@@ -21,18 +21,20 @@ const PublicLayout = () => {
                 </video>
             </div>
 
+            {/* Mobile Navigation - Moved outside content wrapper to ensure global Z-Index priority */}
+            <div className="lg:hidden">
+                <MobileNav />
+            </div>
+
             {/* Content */}
             <div className="relative z-20 flex flex-col min-h-screen">
                 {/* Navigation */}
                 <div className="hidden lg:block fixed top-6 left-0 right-0 z-50 flex justify-center">
                     <DesktopNav />
                 </div>
-                <div className="lg:hidden">
-                    <MobileNav />
-                </div>
 
                 {/* Main Page Content */}
-                <main className="flex-1 w-full max-w-7xl mx-auto px-4 lg:px-8 py-20 lg:pt-52 lg:pb-32">
+                <main className="flex-1 w-full max-w-7xl mx-auto px-4 lg:px-8 pt-32 pb-20 lg:pt-52 lg:pb-32">
                     <Outlet />
                 </main>
             </div>

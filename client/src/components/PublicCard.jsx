@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PublicCard = ({ card, index = 0 }) => {
@@ -147,12 +148,12 @@ const PublicCard = ({ card, index = 0 }) => {
                 </div>
             </div>
 
-            {/* Gallery Modal */}
-            {isGalleryOpen && (
-                <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4">
+            {/* Gallery Modal - Portalled to body to escape parent transforms/z-index */}
+            {isGalleryOpen && createPortal(
+                <div className="fixed inset-0 z-[20000] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4">
                     <button
                         onClick={() => setIsGalleryOpen(false)}
-                        className="absolute top-4 right-4 text-white/50 hover:text-white transition"
+                        className="absolute top-4 right-4 text-white/50 hover:text-white transition z-[20001]"
                     >
                         <X size={32} />
                     </button>
@@ -187,7 +188,8 @@ const PublicCard = ({ card, index = 0 }) => {
                             </button>
                         ))}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );

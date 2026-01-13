@@ -57,12 +57,12 @@ const Card = {
 
         const [result] = await db.query(
             `INSERT INTO circular_items (
-                title, description, section1_images, section2_image, buttons, enquiry_link,
+                title, description, section1_images, section2_image, buttons, enquiry_link, link,
                 card_bg_color, title_color, desc_color, section1_image_width, section1_image_height,
                 is_active, sort_order
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                title, description, JSON.stringify(section1_images || []), section2_image, JSON.stringify(buttons || []), enquiry_link,
+                title, description, JSON.stringify(section1_images || []), section2_image, JSON.stringify(buttons || []), enquiry_link, enquiry_link || '',
                 card_bg_color, title_color, desc_color, thumbnail_width, thumbnail_height,
                 is_active !== undefined ? is_active : 1, sort_order || 0
             ]

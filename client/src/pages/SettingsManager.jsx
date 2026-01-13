@@ -25,6 +25,8 @@ const SettingsManager = () => {
         setSettings({ ...settings, [e.target.name]: e.target.value });
     };
 
+
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         setLogoFile(file);
@@ -119,6 +121,8 @@ const SettingsManager = () => {
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Or Image URL</label>
                     <input name="logo_url" value={settings.logo_url || ''} onChange={handleTextChange} placeholder="https://example.com/logo.png" className="w-full border border-gray-200 rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
                 </div>
+
+
             </div>
 
             {/* WhatsApp */}
