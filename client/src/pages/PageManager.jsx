@@ -46,7 +46,8 @@ const PageManager = () => {
                 </Link>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* Desktop Table */}
+            <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
@@ -79,6 +80,28 @@ const PageManager = () => {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-4">
+                {pages.map((page) => (
+                    <div key={page.id} className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+                        <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-bold text-gray-800 text-lg">{page.title}</h3>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${page.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                {page.is_active ? 'Active' : 'Hidden'}
+                            </span>
+                        </div>
+                        <div className="font-mono text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded w-fit mb-4">/{page.slug}</div>
+                        <div className="flex gap-4 pt-3 border-t border-gray-50">
+                            <Link to={`/admin/pages/${page.id}`} className="flex items-center gap-1 text-blue-600 font-bold text-xs uppercase"><Edit size={14} /> Edit</Link>
+                            <button onClick={() => handleDelete(page.id)} className="flex items-center gap-1 text-red-500 font-bold text-xs uppercase"><Trash size={14} /> Delete</button>
+                        </div>
+                    </div>
+                ))}
+                {pages.length === 0 && (
+                    <div className="py-8 text-center text-gray-400 bg-white rounded-lg border border-dashed">No pages found.</div>
+                )}
             </div>
         </div>
     );

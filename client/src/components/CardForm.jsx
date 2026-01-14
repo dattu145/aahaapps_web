@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import api from '../api';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -41,7 +43,10 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
         section1_images: [],
         section2_image: null,
         thumbnail_width: 160,
-        thumbnail_height: 104
+        section2_image: null,
+        thumbnail_width: 160,
+        thumbnail_height: 104,
+        sort_order: 0
     });
 
     const [newSection2Image, setNewSection2Image] = useState(null);
@@ -62,7 +67,9 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                 buttons: typeof initialData.buttons === 'string' ? JSON.parse(initialData.buttons) : (initialData.buttons || []),
                 section1_images: typeof initialData.section1_images === 'string' ? JSON.parse(initialData.section1_images) : (initialData.section1_images || []),
                 thumbnail_width: initialData.thumbnail_width || 160,
-                thumbnail_height: initialData.thumbnail_height || 104
+                thumbnail_width: initialData.thumbnail_width || 160,
+                thumbnail_height: initialData.thumbnail_height || 104,
+                sort_order: initialData.sort_order || 0
             });
         }
     }, [initialData]);
@@ -90,7 +97,15 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
     const addButton = () => {
         setFormData(prev => ({
             ...prev,
-            buttons: [...prev.buttons, { text: 'New Button', link: '#', bg_color: '#0000ff', text_color: '#ffffff' }]
+            buttons: [...prev.buttons, {
+                text: 'New Button',
+                link: '#',
+                type: 'link', // 'link' or 'popup'
+                popup_content: '',
+                bg_color: '#0000ff',
+                text_color: '#ffffff',
+                font_size: 15
+            }]
         }));
     };
 
@@ -150,7 +165,9 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
         data.append('buttons', JSON.stringify(formData.buttons));
         data.append('section1_images', JSON.stringify(formData.section1_images));
         data.append('thumbnail_width', formData.thumbnail_width);
+
         data.append('thumbnail_height', formData.thumbnail_height);
+        data.append('sort_order', formData.sort_order);
 
         if (newSection2Image) {
             data.append('section2_image', newSection2Image);
@@ -289,6 +306,11 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                         <input name="enquiry_link" value={formData.enquiry_link} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-black outline-none" placeholder="/contact or https://..." />
                         <p className="text-[10px] text-gray-400 mt-1">This link will be used for the "Enquiry" button (common for all cards)</p>
                     </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 mb-2">Display Order</label>
+                        <input type="number" name="sort_order" value={formData.sort_order} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-black outline-none" placeholder="e.g. 1, 2, 3" />
+                        <p className="text-[10px] text-gray-400 mt-1">Lower numbers appear first on the home page</p>
+                    </div>
                 </div>
             </div>
 
@@ -315,25 +337,68 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                                     <input value={btn.text} onChange={(e) => updateButton(index, 'text', e.target.value)} className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm" />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Link</label>
-                                    <input value={btn.link} onChange={(e) => updateButton(index, 'link', e.target.value)} className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm" />
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Type</label>
+                                    <select
+                                        value={btn.type || 'link'}
+                                        onChange={(e) => updateButton(index, 'type', e.target.value)}
+                                        className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm"
+                                    >
+                                        <option value="link">Link</option>
+                                        <option value="popup">Popup</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="mb-4">
+                                {btn.type === 'popup' ? (
+                                    <div className="h-64">
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Popup Content</label>
+                                        <ReactQuill
+                                            theme="snow"
+                                            value={btn.popup_content || ''}
+                                            onChange={(value) => updateButton(index, 'popup_content', value)}
+                                            className="h-48 bg-white"
+                                            modules={{
+                                                toolbar: [
+                                                    ['bold', 'italic', 'underline', 'strike'],
+                                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                    ['link'],
+                                                    ['clean']
+                                                ]
+                                            }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Link URL</label>
+                                        <input value={btn.link} onChange={(e) => updateButton(index, 'link', e.target.value)} className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm" />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Background Color</label>
-                                    <div className="flex items-center gap-2">
-                                        <input type="color" value={btn.bg_color} onChange={(e) => updateButton(index, 'bg_color', e.target.value)} className="h-8 w-10 p-0 border rounded cursor-pointer" />
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">BG Color</label>
+                                    <div className="flex items-center gap-2 border border-gray-300 rounded px-2 py-1 bg-white">
+                                        <input type="color" value={btn.bg_color} onChange={(e) => updateButton(index, 'bg_color', e.target.value)} className="w-6 h-6 border-none p-0 cursor-pointer" />
                                         <span className="text-xs text-gray-500 font-mono">{btn.bg_color}</span>
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Text Color</label>
-                                    <div className="flex items-center gap-2">
-                                        <input type="color" value={btn.text_color} onChange={(e) => updateButton(index, 'text_color', e.target.value)} className="h-8 w-10 p-0 border rounded cursor-pointer" />
+                                    <div className="flex items-center gap-2 border border-gray-300 rounded px-2 py-1 bg-white">
+                                        <input type="color" value={btn.text_color} onChange={(e) => updateButton(index, 'text_color', e.target.value)} className="w-6 h-6 border-none p-0 cursor-pointer" />
                                         <span className="text-xs text-gray-500 font-mono">{btn.text_color}</span>
                                     </div>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Font Size (px)</label>
+                                    <input
+                                        type="number"
+                                        value={btn.font_size || 15}
+                                        onChange={(e) => updateButton(index, 'font_size', e.target.value)}
+                                        className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                                    />
                                 </div>
                             </div>
                         </div>

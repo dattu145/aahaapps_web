@@ -26,6 +26,7 @@ exports.getCards = async (req, res) => {
 exports.createCard = async (req, res) => {
     try {
         // Handle file uploads
+        // Handle file uploads
         const section1_images = req.files['section1_images']
             ? req.files['section1_images'].map(file => `uploads/${file.filename}`)
             : [];

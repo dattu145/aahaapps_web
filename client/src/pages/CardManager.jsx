@@ -68,7 +68,7 @@ const CardManager = () => {
             {/* Phase 6: Dimensions UI Upgrade */}
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-8">
                 <h3 className="text-lg font-bold text-gray-800 mb-6 border-b pb-4">Card Dimensions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     <div>
                         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Card Width (px)</label>
                         <input
@@ -119,8 +119,8 @@ const CardManager = () => {
                 </button>
             </div>
 
-            {/* Table View matching Image 3 */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
@@ -144,7 +144,9 @@ const CardManager = () => {
                                         )}
                                     </div>
                                 </td>
-                                <td className="py-4 px-6 font-medium text-gray-600">{index + 1}</td>
+                                <td className="py-4 px-6 font-medium text-gray-600">
+                                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-bold">{card.sort_order}</span>
+                                </td>
                                 <td className="py-4 px-6 font-bold text-gray-800">{card.title}</td>
                                 <td className="py-4 px-6 text-sm text-gray-500 max-w-xs truncate">{card.description}</td>
                                 <td className="py-4 px-6 text-center">
@@ -163,6 +165,38 @@ const CardManager = () => {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {cards.map((card, index) => (
+                    <div key={card.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex gap-4 items-center">
+                        <div className="w-16 h-16 rounded-lg bg-gray-200 overflow-hidden border border-gray-200 flex-shrink-0">
+                            {card.section2_image ? (
+                                <img src={`/${card.section2_image}`} className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">IMG</div>
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start">
+                                <h4 className="font-bold text-gray-800 truncate">{card.title}</h4>
+                                <div className="flex gap-2">
+                                    <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase">Ord: {card.sort_order}</span>
+                                    <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase">Active</span>
+                                </div>
+                            </div>
+                            <p className="text-xs text-gray-500 truncate mt-1">{card.description}</p>
+                            <div className="flex gap-4 mt-3">
+                                <button onClick={() => handleEdit(card)} className="text-blue-600 font-bold text-xs uppercase flex items-center gap-1"><Edit size={12} /> Edit</button>
+                                <button onClick={() => handleDelete(card.id)} className="text-red-500 font-bold text-xs uppercase flex items-center gap-1"><Trash size={12} /> Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+                {cards.length === 0 && (
+                    <div className="py-8 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-200">No cards found.</div>
+                )}
             </div>
         </div>
     );
