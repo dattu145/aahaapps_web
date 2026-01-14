@@ -43,8 +43,6 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
         section1_images: [],
         section2_image: null,
         thumbnail_width: 160,
-        section2_image: null,
-        thumbnail_width: 160,
         thumbnail_height: 104,
         sort_order: 0
     });
@@ -66,7 +64,6 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                 ...initialData,
                 buttons: typeof initialData.buttons === 'string' ? JSON.parse(initialData.buttons) : (initialData.buttons || []),
                 section1_images: typeof initialData.section1_images === 'string' ? JSON.parse(initialData.section1_images) : (initialData.section1_images || []),
-                thumbnail_width: initialData.thumbnail_width || 160,
                 thumbnail_width: initialData.thumbnail_width || 160,
                 thumbnail_height: initialData.thumbnail_height || 104,
                 sort_order: initialData.sort_order || 0
