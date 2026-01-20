@@ -14,19 +14,21 @@ export const AuthProvider = ({ children }) => {
             const token = localStorage.getItem('token');
             const storedUser = localStorage.getItem('user'); // Simple check, ideally verify token with backend
             if (token && storedUser) {
-                setUser({ username: storedUser });
+                const storedEmail = localStorage.getItem('email');
+                setUser({ username: storedUser, email: storedEmail });
             }
             setLoading(false);
         };
         checkAuth();
     }, []);
 
-    const login = async (username, password) => {
+    const login = async (email, username, password) => {
         try {
-            const { data } = await api.post('/users/login', { username, password });
+            const { data } = await api.post('/users/login', { email, username, password });
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', data.username);
-            setUser({ username: data.username });
+            localStorage.setItem('email', data.email);
+            setUser({ username: data.username, email: data.email });
             return { success: true };
         } catch (error) {
             return {
@@ -39,6 +41,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('email');
         setUser(null);
     };
 

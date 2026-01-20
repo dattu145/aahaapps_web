@@ -5,3 +5,31 @@
 [dotenv@17.2.3] injecting env (1) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
 Database synced successfully
 Server running on port 3000
+[2026-01-17T07:58:02.031Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T07:58:02.078Z] FAIL: User not found: admin@aahaapps.com
+[2026-01-17T07:59:34.647Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T07:59:34.766Z] FAIL: User not found: admin@aahaapps.com
+[2026-01-17T08:00:19.399Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:00:20.038Z] FAIL: User not found: admin@aahaapps.com
+[2026-01-17T08:01:09.375Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:01:09.691Z] FAIL: User not found: admin@aahaapps.com
+[2026-01-17T08:02:52.971Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:02:53.284Z] SUCCESS: Login successful for admin@aahaapps.com
+[2026-01-17T08:04:50.512Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:04:50.884Z] SUCCESS: Login successful for admin@aahaapps.com
+[2026-01-17T08:07:24.453Z] LOGIN_ATTEMPT: Email=dada@gmail.com, User=dasdad
+[2026-01-17T08:07:24.497Z] FAIL: User not found: dasdad
+[2026-01-17T08:07:42.143Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:07:42.924Z] SUCCESS: Login successful for admin@aahaapps.com
+[2026-01-17T08:07:43.492Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:07:43.815Z] FAIL: Password mismatch for admin@aahaapps.com
+[2026-01-17T08:07:56.327Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:07:57.254Z] SUCCESS: Login successful for admin@aahaapps.com
+[2026-01-17T08:07:58.827Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:07:59.137Z] SUCCESS: Login successful for admin@aahaapps.com
+[2026-01-17T08:08:06.205Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-17T08:08:06.670Z] SUCCESS: Login successful for admin@aahaapps.com
+[2026-01-20T10:53:07.420Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-20T10:53:07.684Z] SUCCESS: Login successful for admin@aahaapps.com
+[2026-01-20T10:56:03.060Z] LOGIN_ATTEMPT: Email=a1softsols@gmail.com, User=admin@aahaapps.com
+[2026-01-20T10:56:03.251Z] SUCCESS: Login successful for admin@aahaapps.com

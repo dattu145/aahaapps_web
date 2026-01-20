@@ -1,0 +1,28 @@
+nohup: ignoring input
+[dotenv@17.2.3] injecting env (8) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+DB Config: {
+  host: 'aahaapps-aahaapps.e.aivencloud.com',
+  user: 'avnadmin',
+  db: 'defaultdb',
+  port: '13643'
+}
+Server running on port 5001
+[DEBUG] Generated OTP for a1softsols@gmail.com: 384618
+Sending email to: a1softsols@gmail.com with subject: Verification OTP for Update Profile
+Brevo API Response: {"messageId":"<202601170919.92063537884@smtp-relay.mailin.fr>"}
+[DEBUG] Generated OTP for a1softsols@gmail.com: 548885
+Sending email to: a1softsols@gmail.com with subject: Verification OTP for Update Profile
+Brevo API Response: {"messageId":"<202601170922.80455591285@smtp-relay.mailin.fr>"}
+[DEBUG] Generated OTP for a1softsols@gmail.com: 743247
+Sending email to: a1softsols@gmail.com with subject: Verification OTP for Update Profile
+Brevo API Response: {"messageId":"<202601170924.98356016002@smtp-relay.mailin.fr>"}
+[DEBUG] Generated OTP for a1softsols@gmail.com: 978988
+Sending email to: a1softsols@gmail.com with subject: Verification OTP for Update Profile
+Brevo API Response: {"messageId":"<202601170924.74612748412@smtp-relay.mailin.fr>"}
+[DEBUG] Generated OTP for a1softsols@gmail.com: 819773
+Sending email to: a1softsols@gmail.com with subject: Verification OTP for Update Profile
+Brevo API Response: {"messageId":"<202601170924.89054226638@smtp-relay.mailin.fr>"}
+[DEBUG] Generated OTP for a1softsols@gmail.com: 468337
+Sending email to: a1softsols@gmail.com with subject: Verification OTP for Update Profile
+Brevo API Response: {"messageId":"<202601171010.51754670982@smtp-relay.mailin.fr>"}

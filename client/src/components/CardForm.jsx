@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import api from '../api';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import { Editor } from '@tinymce/tinymce-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -147,6 +146,26 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
             section1_images: prev.section1_images.filter(img => img !== imagePath)
         }));
     };
+
+    // Custom Image Upload Handler for TinyMCE (Shared logic)
+    const handleImageUpload = (blobInfo, progress) => new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append('image', blobInfo.blob(), blobInfo.filename());
+
+        api.post('/pages/upload-image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            onUploadProgress: (e) => {
+                progress(e.loaded / e.total * 100);
+            }
+        })
+            .then(response => {
+                resolve(response.data.url);
+            })
+            .catch(error => {
+                console.error('Image upload failed', error);
+                reject('Image upload failed: ' + error.message);
+            });
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -296,7 +315,21 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-gray-500 mb-2">Description</label>
-                        <textarea name="description" value={formData.description} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-black outline-none" rows="4" />
+                        <div className="border border-gray-300 rounded-lg overflow-hidden">
+                            <Editor
+                                apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                                value={formData.description}
+                                onEditorChange={(content) => setFormData(prev => ({ ...prev, description: content }))}
+                                init={{
+                                    height: 300,
+                                    menubar: false,
+                                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'code', 'help', 'wordcount'],
+                                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic | alignleft aligncenter alignright | bullist numlist | link image code',
+                                    content_style: 'body { font-family:Inter,sans-serif; font-size:14px }',
+                                    images_upload_handler: handleImageUpload
+                                }}
+                            />
+                        </div>
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-gray-500 mb-2">Enquiry Button Link</label>
@@ -350,20 +383,22 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                                 {btn.type === 'popup' ? (
                                     <div className="h-64">
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Popup Content</label>
-                                        <ReactQuill
-                                            theme="snow"
-                                            value={btn.popup_content || ''}
-                                            onChange={(value) => updateButton(index, 'popup_content', value)}
-                                            className="h-48 bg-white"
-                                            modules={{
-                                                toolbar: [
-                                                    ['bold', 'italic', 'underline', 'strike'],
-                                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                    ['link'],
-                                                    ['clean']
-                                                ]
-                                            }}
-                                        />
+
+                                        <div className="border border-gray-300 rounded overflow-hidden">
+                                            <Editor
+                                                apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                                                value={btn.popup_content || ''}
+                                                onEditorChange={(content) => updateButton(index, 'popup_content', content)}
+                                                init={{
+                                                    height: 200,
+                                                    menubar: false,
+                                                    plugins: ['lists', 'link', 'image', 'code'],
+                                                    toolbar: 'bold italic fontfamily fontsize | bullist numlist | link image code',
+                                                    content_style: 'body { font-family:Inter,sans-serif; font-size:12px }',
+                                                    images_upload_handler: handleImageUpload
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 ) : (
                                     <div>

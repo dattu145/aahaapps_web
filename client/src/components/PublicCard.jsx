@@ -4,22 +4,76 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const CardButton = ({ btn, isPopup }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [coords, setCoords] = useState({ top: 0, left: 0, shiftX: 0 });
     const popupRef = useRef(null);
+    const btnRef = useRef(null);
+
+    // Update position when opening
+    const updatePosition = () => {
+        if (btnRef.current) {
+            const rect = btnRef.current.getBoundingClientRect();
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
+
+            // Smart Positioning Logic
+            const btnCenter = rect.left + rect.width / 2;
+            const popupWidth = 280; // slightly larger than w-64 (256px) for safety
+            const screenWidth = window.innerWidth;
+            const padding = 16; // Maintain 16px gap from screen edges
+
+            let shift = 0;
+
+            // Check if popup goes off right edge
+            if (btnCenter + popupWidth / 2 > screenWidth - padding) {
+                shift = (screenWidth - padding) - (btnCenter + popupWidth / 2);
+            }
+            // Check if popup goes off left edge
+            else if (btnCenter - popupWidth / 2 < padding) {
+                shift = padding - (btnCenter - popupWidth / 2);
+            }
+
+            setCoords({
+                top: rect.top + scrollY - 12, // Move up by 12px for spacing
+                left: rect.left + scrollX + rect.width / 2,
+                shiftX: shift
+            });
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
+            if (
+                isOpen &&
+                popupRef.current &&
+                !popupRef.current.contains(event.target) &&
+                btnRef.current &&
+                !btnRef.current.contains(event.target)
+            ) {
                 setIsOpen(false);
             }
         };
 
         if (isOpen) {
             document.addEventListener('mousedown', handleClickOutside);
+            window.addEventListener('scroll', updatePosition);
+            window.addEventListener('resize', updatePosition);
         }
+
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('scroll', updatePosition);
+            window.removeEventListener('resize', updatePosition);
         };
     }, [isOpen]);
+
+    const handleToggle = () => {
+        if (!isOpen) {
+            updatePosition();
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    };
 
     const btnStyle = {
         ...(btn.bg_color ? { backgroundColor: btn.bg_color, color: btn.text_color } : {}),
@@ -28,36 +82,60 @@ const CardButton = ({ btn, isPopup }) => {
 
     if (isPopup) {
         return (
-            <div className="relative group/btn z-10 w-full h-full" ref={popupRef}>
+            <div className="relative w-full h-full">
                 <button
-                    onClick={() => setIsOpen(!isOpen)}
+                    ref={btnRef}
+                    onClick={handleToggle}
                     className="w-full h-full px-4 py-2.5 rounded-lg font-bold shadow-md transform transition hover:-translate-y-0.5 active:translate-y-0 text-center cursor-pointer bg-[#1a1f2e] text-white hover:bg-black flex items-center justify-center"
                     style={btnStyle}
                 >
                     {btn.text}
                 </button>
 
-                {/* Popup Content */}
-                {isOpen && (
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50">
-                        <div className="w-64 p-4 bg-white rounded-xl shadow-xl border border-gray-100 text-center animate-fade-in-up relative">
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsOpen(false);
-                                }}
-                                className="absolute top-2 right-2 text-gray-400 hover:text-black p-1"
-                            >
-                                <X size={14} />
-                            </button>
-                            <div
-                                className="text-sm text-gray-700 leading-relaxed font-normal prose prose-sm max-w-none mt-2"
-                                dangerouslySetInnerHTML={{ __html: btn.popup_content }}
-                            />
-                            {/* Arrow */}
-                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white transform rotate-45 border-b border-r border-gray-100"></div>
+                {/* Portal Popup - Smart Positioned */}
+                {isOpen && createPortal(
+                    <div
+                        className="absolute z-[9999]"
+                        style={{
+                            top: coords.top,
+                            left: coords.left,
+                        }}
+                    >
+                        {/* Wrapper handles centering + shift to stay on screen */}
+                        {/* Fix: transform combines both X and Y translation */}
+                        <div
+                            ref={popupRef}
+                            className="relative"
+                            style={{
+                                transform: `translate(calc(-50% + ${coords.shiftX}px), -100%)`
+                            }}
+                        >
+                            <div className="w-64 p-4 bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-gray-100 text-center animate-fade-in-up relative">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsOpen(false);
+                                    }}
+                                    className="absolute top-2 right-2 text-gray-400 hover:text-black p-1 bg-white rounded-full hover:bg-gray-100 transition"
+                                >
+                                    <X size={16} />
+                                </button>
+                                <div
+                                    className="text-sm text-gray-700 leading-relaxed font-normal prose prose-sm max-w-none mt-2 max-h-[60vh] overflow-y-auto custom-scrollbar"
+                                    dangerouslySetInnerHTML={{ __html: btn.popup_content }}
+                                />
+                                {/* Arrow - Counter-shifted to stay pointing at button */}
+                                <div
+                                    className="absolute -bottom-2 left-1/2 w-4 h-4 bg-white border-b border-r border-gray-100"
+                                    style={{
+                                        marginLeft: '-8px', // Center 16px element
+                                        transform: `translateX(${-coords.shiftX}px) rotate(45deg)`
+                                    }}
+                                ></div>
+                            </div>
                         </div>
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </div>
         );

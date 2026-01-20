@@ -14,7 +14,6 @@ const AdminLayout = () => {
         { label: 'Menus', path: '/admin/menus' },
         { label: 'Pages', path: '/admin/pages' },
         { label: 'Home Page Cards', path: '/admin/cards' },
-        { label: 'Database', path: '/admin/database' },
         { label: 'Settings', path: '/admin/settings' },
     ];
 
@@ -68,14 +67,23 @@ const AdminLayout = () => {
                         <ChevronDown size={16} className="text-gray-500" />
 
                         {/* Dropdown for Logout */}
-                        <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 hidden group-hover:block">
-                            <button
-                                onClick={logout}
-                                className="flex items-center gap-2 px-4 py-2 w-full text-sm text-red-600 hover:bg-red-50 text-left"
-                            >
-                                <LogOut size={16} />
-                                Logout
-                            </button>
+                        <div className="absolute top-full right-0 pt-2 w-48 hidden group-hover:block">
+                            <div className="bg-white rounded-lg shadow-xl border border-gray-100 py-1">
+                                <Link
+                                    to="/admin/profile"
+                                    className="flex items-center gap-2 px-4 py-2 w-full text-sm text-gray-700 hover:bg-gray-50 text-left"
+                                >
+                                    <Settings size={16} /> {/* Reusing Settings icon or generic */}
+                                    Profile
+                                </Link>
+                                <button
+                                    onClick={logout}
+                                    className="flex items-center gap-2 px-4 py-2 w-full text-sm text-red-600 hover:bg-red-50 text-left"
+                                >
+                                    <LogOut size={16} />
+                                    Logout
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

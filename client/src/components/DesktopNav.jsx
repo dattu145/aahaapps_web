@@ -113,13 +113,13 @@ const DesktopNav = () => {
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-4 pr-2">
-                        <span className="text-black font-semibold text-lg cursor-pointer hover:text-gray-600">Contact</span>
-                        <Link
-                            to="/login"
+                        <Link to="/contact" className="text-black font-semibold text-lg cursor-pointer hover:text-gray-600">Contact</Link>
+                        <a
+                            href="https://profile.aahaapps.com/login"
                             className="bg-[#1DBF57] text-white px-8 py-3 rounded-full text-lg font-bold shadow hover:bg-green-600 transition"
                         >
                             Login
-                        </Link>
+                        </a>
                     </div>
                 </div>
 

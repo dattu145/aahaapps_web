@@ -1,14 +1,13 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import { Editor } from '@tinymce/tinymce-react';
 import api from '../api';
 import { Save, ArrowLeft } from 'lucide-react';
 
 const PageForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const quillRef = useRef(null);
+    const editorRef = useRef(null);
     const isEdit = !!id && id !== 'create';
 
     const [formData, setFormData] = useState({
@@ -32,59 +31,39 @@ const PageForm = () => {
         }
     }, [id, isEdit]);
 
-    // Image Handler for Quill
-    const imageHandler = () => {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
-        input.click();
+    // Custom Image Upload Handler for TinyMCE
+    const handleImageUpload = (blobInfo, progress) => new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append('image', blobInfo.blob(), blobInfo.filename());
 
-        input.onchange = async () => {
-            const file = input.files[0];
-            const form = new FormData();
-            form.append('image', file);
-
-            try {
-                // Upload to our server endpoint
-                const { data } = await api.post('/pages/upload-image', form, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-
-                // Insert into editor
-                const range = quillRef.current.getEditor().getSelection();
-                quillRef.current.getEditor().insertEmbed(range.index, 'image', data.url);
-            } catch (error) {
+        api.post('/pages/upload-image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            onUploadProgress: (e) => {
+                progress(e.loaded / e.total * 100);
+            }
+        })
+            .then(response => {
+                // TinyMCE expects the LOCATION of the image
+                resolve(response.data.url);
+            })
+            .catch(error => {
                 console.error('Image upload failed', error);
-                alert('Image upload failed');
-            }
-        };
-    };
-
-    const modules = useMemo(() => ({
-        toolbar: {
-            container: [
-                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                [{ 'font': [] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ 'color': [] }, { 'background': [] }],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                [{ 'align': [] }],
-                ['link', 'image'],
-                ['clean']
-            ],
-            handlers: {
-                image: imageHandler
-            }
-        }
-    }), []);
+                reject('Image upload failed: ' + error.message);
+            });
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Get content from editor
+            const content = editorRef.current ? editorRef.current.getContent() : formData.content;
+
+            const payload = { ...formData, content };
+
             if (isEdit) {
-                await api.put(`/pages/${id}`, formData);
+                await api.put(`/pages/${id}`, payload);
             } else {
-                await api.post('/pages', formData);
+                await api.post('/pages', payload);
             }
             navigate('/admin/pages');
         } catch (error) {
@@ -94,7 +73,7 @@ const PageForm = () => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
             <button onClick={() => navigate('/admin/pages')} className="flex items-center gap-2 text-gray-500 hover:text-black font-bold text-sm">
                 <ArrowLeft size={16} /> Back to Pages
             </button>
@@ -128,14 +107,33 @@ const PageForm = () => {
 
                     <div>
                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Content</label>
-                        <div className="h-[400px] mb-12">
-                            <ReactQuill
-                                ref={quillRef}
-                                theme="snow"
+                        <div className="min-h-[500px] mb-8 border border-gray-200 rounded-lg overflow-hidden">
+                            <Editor
+                                apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                                onInit={(evt, editor) => editorRef.current = editor}
                                 value={formData.content}
-                                onChange={(value) => setFormData({ ...formData, content: value })}
-                                modules={modules}
-                                className="h-full"
+                                onEditorChange={(newValue) => setFormData({ ...formData, content: newValue })}
+                                init={{
+                                    height: 500,
+                                    menubar: false,
+                                    plugins: [
+                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                    ],
+                                    toolbar: 'undo redo | blocks fontfamily fontsize | ' +
+                                        'bold italic forecolor | alignleft aligncenter ' +
+                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                        'image media link code | removeformat | help',
+                                    content_style: 'body { font-family:Inter,sans-serif; font-size:14px }',
+                                    images_upload_handler: handleImageUpload,
+                                    image_advtab: true, // Advanced image options
+                                    image_class_list: [
+                                        { title: 'None', value: '' },
+                                        { title: 'Responsive', value: 'img-fluid' },
+                                        { title: 'Rounded', value: 'rounded-lg' }
+                                    ]
+                                }}
                             />
                         </div>
                     </div>

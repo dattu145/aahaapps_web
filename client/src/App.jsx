@@ -13,7 +13,8 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import PageManager from './pages/PageManager';
 import PageForm from './pages/PageForm';
 import DynamicPage from './pages/DynamicPage';
-import DatabaseManager from './pages/DatabaseManager';
+import Profile from './pages/Profile';
+
 
 function App() {
   return (
@@ -36,7 +37,8 @@ function App() {
             <Route path="pages/create" element={<PageForm />} />
             <Route path="pages/:id" element={<PageForm />} />
             <Route path="settings" element={<SettingsManager />} />
-            <Route path="database" element={<DatabaseManager />} />
+            <Route path="profile" element={<Profile />} />
+
           </Route>
         </Routes>
       </AuthProvider>

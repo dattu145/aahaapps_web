@@ -36,7 +36,7 @@ app.use('/api/settings', settingRoutes);
 app.use('/api/menus', menuRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/pages', require('./routes/pageRoutes'));
-app.use('/api/database', require('./routes/databaseRoutes'));
+
 
 // Serve static files from client build
 // Serve static files from client build

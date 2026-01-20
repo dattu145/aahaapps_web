@@ -24,6 +24,21 @@ const User = {
     findById: async (id) => {
         const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
         return rows[0];
+    },
+
+    update: async (id, { username, password, email }) => {
+        const fields = [];
+        const values = [];
+
+        if (username) { fields.push('name = ?'); values.push(username); }
+        if (password) { fields.push('password = ?'); values.push(password); }
+        if (email) { fields.push('email = ?'); values.push(email); }
+
+        if (fields.length === 0) return null;
+
+        values.push(id);
+        await db.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, values);
+        return true;
     }
 };
 
