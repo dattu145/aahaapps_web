@@ -133,6 +133,24 @@ exports.updateCard = async (req, res) => {
     }
 };
 
+// Reorder cards
+exports.reorderCards = async (req, res) => {
+    try {
+        const { order } = req.body; // Array of { id, sort_order } or just ids in order
+        // Taking simplistic approach: array of objects { id: 1, sort_order: 0 }, { id: 5, sort_order: 1 }...
+
+        // Use Promise.all to update in parallel (or could use a transaction/batch case query)
+        const updatePromises = order.map(({ id, sort_order }) => {
+            return Card.update(id, { sort_order });
+        });
+
+        await Promise.all(updatePromises);
+        res.status(200).json({ message: 'Reorder successful' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 // Delete a card
 exports.deleteCard = async (req, res) => {
     try {

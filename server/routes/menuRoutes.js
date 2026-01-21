@@ -5,6 +5,7 @@ const menuController = require('../controllers/menuController');
 router.get('/', menuController.getMenus);
 router.post('/', menuController.createMenu);
 router.put('/:id', menuController.updateMenu);
+router.post('/reorder', menuController.reorderMenus);
 router.delete('/:id', menuController.deleteMenu);
 
 module.exports = router;

@@ -36,6 +36,22 @@ exports.updateMenu = async (req, res) => {
     }
 };
 
+// Reorder menu items
+exports.reorderMenus = async (req, res) => {
+    try {
+        const { order } = req.body;
+        const updatePromises = order.map(({ id, sort_order }) => {
+            // Map frontend 'sort_order' to database column 'order'
+            return Menu.update(id, { order: sort_order });
+        });
+
+        await Promise.all(updatePromises);
+        res.status(200).json({ message: 'Menu reorder successful' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 // Delete menu item
 exports.deleteMenu = async (req, res) => {
     try {

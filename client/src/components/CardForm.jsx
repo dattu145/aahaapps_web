@@ -183,7 +183,7 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
         data.append('thumbnail_width', formData.thumbnail_width);
 
         data.append('thumbnail_height', formData.thumbnail_height);
-        data.append('sort_order', formData.sort_order);
+
 
         if (newSection2Image) {
             data.append('section2_image', newSection2Image);
@@ -336,11 +336,7 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
                         <input name="enquiry_link" value={formData.enquiry_link} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-black outline-none" placeholder="/contact or https://..." />
                         <p className="text-[10px] text-gray-400 mt-1">This link will be used for the "Enquiry" button (common for all cards)</p>
                     </div>
-                    <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-2">Display Order</label>
-                        <input type="number" name="sort_order" value={formData.sort_order} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-black outline-none" placeholder="e.g. 1, 2, 3" />
-                        <p className="text-[10px] text-gray-400 mt-1">Lower numbers appear first on the home page</p>
-                    </div>
+
                 </div>
             </div>
 

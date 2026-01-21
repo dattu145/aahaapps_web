@@ -28,3 +28,4 @@ yarn-error.log*
 /server/uploads/*
 !/server/uploads/.gitkeep
 /server/database.sqlite
+Learn.html

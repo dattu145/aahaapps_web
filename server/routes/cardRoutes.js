@@ -11,6 +11,7 @@ const uploadFields = upload.fields([
 router.get('/', cardController.getCards);
 router.post('/', uploadFields, cardController.createCard);
 router.put('/:id', uploadFields, cardController.updateCard);
+router.post('/reorder', cardController.reorderCards);
 router.delete('/:id', cardController.deleteCard);
 
 module.exports = router;
