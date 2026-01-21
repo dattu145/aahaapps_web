@@ -153,9 +153,58 @@ const CardButton = ({ btn, isPopup }) => {
     );
 };
 
+const ExpandableDescription = ({ content, textColor, isExpanded, onToggle }) => {
+    const textRef = useRef(null);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+
+    useEffect(() => {
+        const checkOverflow = () => {
+            if (textRef.current) {
+                setIsOverflowing(textRef.current.scrollHeight > textRef.current.clientHeight + 1);
+            }
+        };
+
+        checkOverflow();
+        window.addEventListener('resize', checkOverflow);
+        return () => window.removeEventListener('resize', checkOverflow);
+    }, [content, isExpanded]);
+
+    return (
+        <div className="flex flex-col items-start mb-4">
+            <div
+                ref={textRef}
+                className={`text-sm text-gray-600 leading-relaxed prose prose-sm max-w-none [&>*:last-child]:mb-0`}
+                style={{
+                    color: textColor,
+                    ...(!isExpanded ? {
+                        display: '-webkit-box',
+                        WebkitLineClamp: 4,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                    } : {})
+                }}
+                dangerouslySetInnerHTML={{ __html: content }}
+            />
+
+            {(isOverflowing || isExpanded) && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onToggle();
+                    }}
+                    className="mt-1 text-blue-600 font-medium text-sm hover:underline focus:outline-none"
+                >
+                    {isExpanded ? 'Show Less' : 'Read More...'}
+                </button>
+            )}
+        </div>
+    );
+};
+
 const PublicCard = ({ card, index = 0 }) => {
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const section1Images = typeof card.section1_images === 'string'
         ? JSON.parse(card.section1_images)
@@ -200,7 +249,7 @@ const PublicCard = ({ card, index = 0 }) => {
                 }}
             >
                 {/* Desktop Layout: 3 Columns Grid */}
-                <div className="hidden lg:grid lg:grid-cols-12 gap-0 h-[500px]">
+                <div className={`hidden lg:grid lg:grid-cols-12 gap-0 transition-all duration-500 ease-in-out ${isExpanded ? 'min-h-[500px] h-auto' : 'h-[500px]'}`}>
 
                     {/* Col 1: Vertical Thumbnails Scroll */}
                     {!isOnlyMainImage && (
@@ -242,14 +291,14 @@ const PublicCard = ({ card, index = 0 }) => {
                             >
                                 {card.title}
                             </h2>
-                            <p
-                                className="text-sm text-gray-600 mb-8 leading-relaxed"
-                                style={{ color: card.desc_color }}
-                            >
-                                {card.description}
-                            </p>
+                            <ExpandableDescription
+                                content={card.description}
+                                textColor={card.desc_color}
+                                isExpanded={isExpanded}
+                                onToggle={() => setIsExpanded(!isExpanded)}
+                            />
 
-                            <div className="grid grid-cols-2 gap-3 mt-auto w-full [&>*:nth-child(odd):last-child]:col-span-2">
+                            <div className="grid grid-cols-2 gap-3 mt-4 w-full [&>*:nth-child(odd):last-child]:col-span-2">
                                 {buttons.map((btn, i) => (
                                     <CardButton key={i} btn={btn} isPopup={btn.type === 'popup'} />
                                 ))}
@@ -283,7 +332,12 @@ const PublicCard = ({ card, index = 0 }) => {
                     {/* 3. Content */}
                     <div className="p-6 bg-white" style={{ backgroundColor: card.card_bg_color }}>
                         <h2 className="text-2xl font-bold mb-2 text-gray-900" style={{ color: card.title_color }}>{card.title}</h2>
-                        <p className="mb-6 text-gray-600 text-sm" style={{ color: card.desc_color }}>{card.description}</p>
+                        <ExpandableDescription
+                            content={card.description}
+                            textColor={card.desc_color}
+                            isExpanded={isExpanded}
+                            onToggle={() => setIsExpanded(!isExpanded)}
+                        />
                         <div className="grid grid-cols-2 gap-3 relative w-full [&>*:nth-child(odd):last-child]:col-span-2">
                             {buttons.map((btn, i) => (
                                 <CardButton key={i} btn={btn} isPopup={btn.type === 'popup'} />
