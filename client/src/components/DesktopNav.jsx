@@ -133,11 +133,7 @@ const DesktopNav = () => {
                     `}
                 >
                     {/* Close Button Row (Optional redundant close, UX choice) */}
-                    <div className="w-full flex justify-end mb-4">
-                        <button onClick={() => setIsHovered(false)} className="text-gray-400 hover:text-black flex items-center gap-1 text-xs font-bold uppercase">
-                            <X size={16} /> Close
-                        </button>
-                    </div>
+
 
                     <div className="flex w-full h-full">
                         {/* Col 1: Main Menu */}
