@@ -80,6 +80,11 @@ exports.updateCard = async (req, res) => {
         if (req.files['section2_video'] && req.files['section2_video'][0]) {
             deleteFile(card.section2_video);
             section2_video = `uploads/${req.files['section2_video'][0].filename}`;
+        } else if (section2_video === 'DELETE') {
+            deleteFile(card.section2_video);
+            section2_video = null;
+        } else {
+            section2_video = card.section2_video; // Default keep existing
         }
 
         // 2. Handle Section 1 Images (Gallery)
@@ -120,7 +125,7 @@ exports.updateCard = async (req, res) => {
             ...otherFields,
             section1_images: updatedSection1Images,
             section2_image: section2_image || card.section2_image,
-            section2_video: section2_video || card.section2_video,
+            section2_video: section2_video, // Now correctly handles null
             video_options: video_options || card.video_options,
             buttons: buttons || card.buttons
         };

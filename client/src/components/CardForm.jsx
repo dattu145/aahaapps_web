@@ -212,11 +212,19 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
         data.append('video_options', JSON.stringify(formData.video_options));
 
 
-        if (newSection2Image) {
-            data.append('section2_image', newSection2Image);
-        }
-        if (newSection2Video) {
-            data.append('section2_video', newSection2Video);
+        if (section2Type === 'image') {
+            if (newSection2Image) {
+                data.append('section2_image', newSection2Image);
+            }
+            // Explicitly signal to delete any existing video
+            data.append('section2_video', 'DELETE');
+        } else {
+            // Main type is Video
+            if (newSection2Video) {
+                data.append('section2_video', newSection2Video);
+            }
+            // Optionally delete existing image if we want exclusivity
+            // data.append('section2_image', 'DELETE');
         }
 
         newSection1Images.forEach(file => {
