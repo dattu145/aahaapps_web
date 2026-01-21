@@ -75,12 +75,20 @@ const MobileNav = () => {
 
             {/* Side Drawer Menu */}
             <div
-                className={`lg:hidden fixed inset-y-0 right-0 z-[10000] w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`lg:hidden fixed inset-y-0 left-0 z-[10000] w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header: Menu Title & Close */}
                 <div className="flex justify-between items-center p-6 border-b border-gray-100">
-                    <h2 className="text-2xl font-bold text-gray-900">Menu</h2>
+                    {settings.site_logo ? (
+                        <img
+                            src={`/${settings.site_logo}`}
+                            alt="Logo"
+                            className="h-10 object-contain"
+                        />
+                    ) : (
+                        <h2 className="text-2xl font-bold text-gray-900">Menu</h2>
+                    )}
                     <button
                         onClick={() => setIsOpen(false)}
                         className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
