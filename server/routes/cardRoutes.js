@@ -5,7 +5,8 @@ const upload = require('../middleware/upload');
 
 const uploadFields = upload.fields([
     { name: 'section1_images', maxCount: 10 },
-    { name: 'section2_image', maxCount: 1 }
+    { name: 'section2_image', maxCount: 1 },
+    { name: 'section2_video', maxCount: 1 }
 ]);
 
 router.get('/', cardController.getCards);

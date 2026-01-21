@@ -41,12 +41,21 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
         buttons: [],
         section1_images: [],
         section2_image: null,
+        section2_video: null,
+        video_options: {
+            autoplay: false,
+            loop: false,
+            muted: false,
+            controls: true
+        },
         thumbnail_width: 160,
         thumbnail_height: 104,
         sort_order: 0
     });
 
+    const [section2Type, setSection2Type] = useState('image'); // 'image' or 'video'
     const [newSection2Image, setNewSection2Image] = useState(null);
+    const [newSection2Video, setNewSection2Video] = useState(null);
     const [newSection1Images, setNewSection1Images] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -59,20 +68,36 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
 
     useEffect(() => {
         if (initialData) {
+            const hasVideo = !!initialData.section2_video;
             setFormData({
                 ...initialData,
                 buttons: typeof initialData.buttons === 'string' ? JSON.parse(initialData.buttons) : (initialData.buttons || []),
                 section1_images: typeof initialData.section1_images === 'string' ? JSON.parse(initialData.section1_images) : (initialData.section1_images || []),
+                video_options: typeof initialData.video_options === 'string' ? JSON.parse(initialData.video_options) : (initialData.video_options || { autoplay: false, loop: false, muted: false, controls: true }),
                 thumbnail_width: initialData.thumbnail_width || 160,
                 thumbnail_height: initialData.thumbnail_height || 104,
                 sort_order: initialData.sort_order || 0
             });
+            if (hasVideo) {
+                setSection2Type('video');
+            }
         }
     }, [initialData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleVideoOptionChange = (e) => {
+        const { name, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            video_options: {
+                ...prev.video_options,
+                [name]: checked
+            }
+        }));
     };
 
     const handleDragEnd = (event) => {
@@ -125,13 +150,14 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
         }
     };
 
+    const handleSection2VideoChange = (e) => {
+        if (e.target.files[0]) {
+            setNewSection2Video(e.target.files[0]);
+        }
+    };
+
     const handleSection1ImagesChange = (e) => {
         if (e.target.files) {
-            // Append new files instead of replacing, if that's desired behavior, or just replace.
-            // Standard file input behavior replaces. Here we'll stick to replacing "current selection" 
-            // but we might want to accumulate if the user wants to add more?
-            // User request implies "remove selected", suggesting they might want to manage this list.
-            // Let's create an array from the FileList.
             setNewSection1Images(prev => [...prev, ...Array.from(e.target.files)]);
         }
     };
@@ -183,10 +209,14 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
         data.append('thumbnail_width', formData.thumbnail_width);
 
         data.append('thumbnail_height', formData.thumbnail_height);
+        data.append('video_options', JSON.stringify(formData.video_options));
 
 
         if (newSection2Image) {
             data.append('section2_image', newSection2Image);
+        }
+        if (newSection2Video) {
+            data.append('section2_video', newSection2Video);
         }
 
         newSection1Images.forEach(file => {
@@ -293,20 +323,70 @@ const CardForm = ({ initialData, onSuccess, onCancel }) => {
             <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
                 <h4 className="text-sm font-bold text-gray-800 uppercase mb-4">Section 2: Main Content</h4>
 
-                <div className="mb-6">
-                    <label className="block text-xs font-bold text-gray-500 mb-2">Main Image</label>
-                    <input type="file" onChange={handleSection2ImageChange} accept="image/*" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-white file:text-gray-700 file:border-gray-200 hover:file:bg-gray-100 border border-gray-200 rounded-lg bg-white p-1" />
-
-                    {(newSection2Image || formData.section2_image) && (
-                        <div className="mt-4 h-48 w-full bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
-                            <img
-                                src={newSection2Image ? URL.createObjectURL(newSection2Image) : `/${formData.section2_image}`}
-                                alt="Preview"
-                                className="h-full object-contain"
-                            />
-                        </div>
-                    )}
+                {/* Content Type Toggle */}
+                <div className="flex gap-4 mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" checked={section2Type === 'image'} onChange={() => setSection2Type('image')} className="text-blue-600 focus:ring-blue-500" />
+                        <span className="text-sm font-semibold text-gray-700">Image</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" checked={section2Type === 'video'} onChange={() => setSection2Type('video')} className="text-blue-600 focus:ring-blue-500" />
+                        <span className="text-sm font-semibold text-gray-700">Video</span>
+                    </label>
                 </div>
+
+                {section2Type === 'image' && (
+                    <div className="mb-6">
+                        <label className="block text-xs font-bold text-gray-500 mb-2">Main Image</label>
+                        <input type="file" onChange={handleSection2ImageChange} accept="image/*" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-white file:text-gray-700 file:border-gray-200 hover:file:bg-gray-100 border border-gray-200 rounded-lg bg-white p-1" />
+
+                        {(newSection2Image || formData.section2_image) && (
+                            <div className="mt-4 h-48 w-full bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
+                                <img
+                                    src={newSection2Image ? URL.createObjectURL(newSection2Image) : `/${formData.section2_image}`}
+                                    alt="Preview"
+                                    className="h-full object-contain"
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {section2Type === 'video' && (
+                    <div className="mb-6">
+                        <label className="block text-xs font-bold text-gray-500 mb-2">Main Video (MP4, WebM)</label>
+                        <input type="file" onChange={handleSection2VideoChange} accept="video/*" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-white file:text-gray-700 file:border-gray-200 hover:file:bg-gray-100 border border-gray-200 rounded-lg bg-white p-1" />
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            <label className="flex items-center gap-2 text-sm text-gray-600">
+                                <input type="checkbox" name="autoplay" checked={formData.video_options?.autoplay} onChange={handleVideoOptionChange} />
+                                Autoplay
+                            </label>
+                            <label className="flex items-center gap-2 text-sm text-gray-600">
+                                <input type="checkbox" name="loop" checked={formData.video_options?.loop} onChange={handleVideoOptionChange} />
+                                Loop
+                            </label>
+                            <label className="flex items-center gap-2 text-sm text-gray-600">
+                                <input type="checkbox" name="muted" checked={formData.video_options?.muted} onChange={handleVideoOptionChange} />
+                                Muted
+                            </label>
+                            <label className="flex items-center gap-2 text-sm text-gray-600">
+                                <input type="checkbox" name="controls" checked={formData.video_options?.controls} onChange={handleVideoOptionChange} />
+                                Controls
+                            </label>
+                        </div>
+
+                        {(newSection2Video || formData.section2_video) && (
+                            <div className="mt-4 h-48 w-full bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
+                                <video
+                                    src={newSection2Video ? URL.createObjectURL(newSection2Video) : `/${formData.section2_video}`}
+                                    controls={true}
+                                    className="h-full max-w-full"
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 <div className="space-y-4">
                     <div>

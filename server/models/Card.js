@@ -18,12 +18,21 @@ const Card = {
             buttons = [];
         }
 
+        let videoOptions = {};
+        try {
+            videoOptions = typeof row.video_options === 'string' ? JSON.parse(row.video_options || '{}') : (row.video_options || {});
+        } catch (e) {
+            videoOptions = {};
+        }
+
         return {
             id: row.id,
             title: row.title,
             description: row.description,
             section1_images: sec1Images,
             section2_image: row.section2_image,
+            section2_video: row.section2_video,
+            video_options: videoOptions,
             buttons: buttons,
             enquiry_link: row.enquiry_link || row.link, // Fallback to link if enquiry_link is empty
             card_bg_color: row.card_bg_color || row.color, // Fallback to color
@@ -50,19 +59,19 @@ const Card = {
 
     create: async (data) => {
         const {
-            title, description, section1_images, section2_image, buttons, enquiry_link,
+            title, description, section1_images, section2_image, section2_video, video_options, buttons, enquiry_link,
             card_bg_color, title_color, desc_color, thumbnail_width, thumbnail_height,
             is_active, sort_order
         } = data;
 
         const [result] = await db.query(
             `INSERT INTO circular_items (
-                title, description, section1_images, section2_image, buttons, enquiry_link, link,
+                title, description, section1_images, section2_image, section2_video, video_options, buttons, enquiry_link, link,
                 card_bg_color, title_color, desc_color, section1_image_width, section1_image_height,
                 is_active, sort_order
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                title, description, JSON.stringify(section1_images || []), section2_image, JSON.stringify(buttons || []), enquiry_link, enquiry_link || '',
+                title, description, JSON.stringify(section1_images || []), section2_image, section2_video, JSON.stringify(video_options || {}), JSON.stringify(buttons || []), enquiry_link, enquiry_link || '',
                 card_bg_color, title_color, desc_color, thumbnail_width, thumbnail_height,
                 is_active !== undefined ? is_active : 1, sort_order || 0
             ]
@@ -79,6 +88,8 @@ const Card = {
         if (data.description !== undefined) { updates.push('description = ?'); values.push(data.description); }
         if (data.section1_images !== undefined) { updates.push('section1_images = ?'); values.push(JSON.stringify(data.section1_images)); }
         if (data.section2_image !== undefined) { updates.push('section2_image = ?'); values.push(data.section2_image); }
+        if (data.section2_video !== undefined) { updates.push('section2_video = ?'); values.push(data.section2_video); }
+        if (data.video_options !== undefined) { updates.push('video_options = ?'); values.push(JSON.stringify(data.video_options)); }
         if (data.buttons !== undefined) { updates.push('buttons = ?'); values.push(JSON.stringify(data.buttons)); }
         if (data.enquiry_link !== undefined) { updates.push('enquiry_link = ?'); values.push(data.enquiry_link); }
         if (data.card_bg_color !== undefined) { updates.push('card_bg_color = ?'); values.push(data.card_bg_color); }

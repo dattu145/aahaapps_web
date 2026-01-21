@@ -408,7 +408,18 @@ const PublicCard = ({ card, index = 0, borderRadius = 16, scrollSpeed = 0.8 }) =
 
                     {/* Col 2: Main Image */}
                     <div className={`${isOnlyMainImage ? 'col-span-12' : 'col-span-6'} relative group overflow-hidden bg-gray-50 flex items-center justify-center p-4`}>
-                        {card.section2_image ? (
+                        {card.section2_video ? (
+                            <video
+                                src={`/${card.section2_video}`}
+                                className="max-w-full max-h-full object-contain"
+                                controls={card.video_options?.controls}
+                                autoPlay={card.video_options?.autoplay}
+                                loop={card.video_options?.loop}
+                                muted={card.video_options?.muted}
+                                playsInline
+                                onContextMenu={(e) => e.preventDefault()}
+                            />
+                        ) : card.section2_image ? (
                             <img
                                 src={`/${card.section2_image}`}
                                 className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105"
@@ -480,9 +491,20 @@ const PublicCard = ({ card, index = 0, borderRadius = 16, scrollSpeed = 0.8 }) =
 
                     {/* 2. Main Image */}
                     <div className="aspect-video w-full bg-gray-50 relative p-2">
-                        {card.section2_image && (
+                        {card.section2_video ? (
+                            <video
+                                src={`/${card.section2_video}`}
+                                className="w-full h-full object-contain"
+                                controls={card.video_options?.controls}
+                                autoPlay={card.video_options?.autoplay}
+                                loop={card.video_options?.loop}
+                                muted={card.video_options?.muted}
+                                playsInline
+                                onContextMenu={(e) => e.preventDefault()}
+                            />
+                        ) : card.section2_image ? (
                             <img src={`/${card.section2_image}`} className="w-full h-full object-contain" />
-                        )}
+                        ) : null}
                     </div>
 
                     {/* 3. Content */}

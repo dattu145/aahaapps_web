@@ -27,7 +27,9 @@ const SortableRow = ({ card, onEdit, onDelete }) => {
             {/* Preview Image - 1 Col */}
             <div className="col-span-1">
                 <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden border border-gray-200">
-                    {card.section2_image ? (
+                    {card.section2_video ? (
+                        <video src={`/${card.section2_video}`} className="w-full h-full object-cover" muted />
+                    ) : card.section2_image ? (
                         <img src={`/${card.section2_image}`} className="w-full h-full object-cover" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">IMG</div>
@@ -75,7 +77,9 @@ const SortableMobileItem = ({ card, onEdit, onDelete }) => {
                 <GripVertical size={24} />
             </div>
             <div className="w-16 h-16 rounded-lg bg-gray-200 overflow-hidden border border-gray-200 flex-shrink-0">
-                {card.section2_image ? (
+                {card.section2_video ? (
+                    <video src={`/${card.section2_video}`} className="w-full h-full object-cover" muted />
+                ) : card.section2_image ? (
                     <img src={`/${card.section2_image}`} className="w-full h-full object-cover" />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">IMG</div>
@@ -324,7 +328,9 @@ const CardManager = () => {
                                 <GripVertical size={20} />
                             </div>
                             <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden border border-gray-200 flex-shrink-0">
-                                {activeCard.section2_image ? (
+                                {activeCard.section2_video ? (
+                                    <video src={`/${activeCard.section2_video}`} className="w-full h-full object-cover" muted />
+                                ) : activeCard.section2_image ? (
                                     <img src={`/${activeCard.section2_image}`} className="w-full h-full object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">IMG</div>
