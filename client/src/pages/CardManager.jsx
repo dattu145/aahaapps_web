@@ -103,7 +103,7 @@ const CardManager = () => {
     const [cards, setCards] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [currentCard, setCurrentCard] = useState(null);
-    const [dimensions, setDimensions] = useState({ width: 350, height: 280, radius: 5 });
+    const [settings, setSettings] = useState({ card_radius: '16', card_scroll_speed: '0.8' });
     const [activeId, setActiveId] = useState(null);
 
     const sensors = useSensors(
@@ -117,19 +117,42 @@ const CardManager = () => {
         })
     );
 
-    const fetchCards = async () => {
+    const fetchData = async () => {
         try {
-            const { data } = await api.get('/cards');
-            const sorted = data.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+            const [cardsRes, settingsRes] = await Promise.all([
+                api.get('/cards'),
+                api.get('/settings')
+            ]);
+
+            const sorted = cardsRes.data.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
             setCards(sorted);
+
+            if (settingsRes.data) {
+                setSettings({
+                    card_radius: settingsRes.data.card_radius || '16',
+                    card_scroll_speed: settingsRes.data.card_scroll_speed || '0.8'
+                });
+            }
         } catch (error) {
-            console.error('Error fetching cards:', error);
+            console.error('Error fetching data:', error);
         }
     };
 
     useEffect(() => {
-        fetchCards();
+        fetchData();
     }, []);
+
+    const handleUpdateSettings = async () => {
+        try {
+            await api.put('/settings', settings);
+            alert('Card settings updated successfully!');
+        } catch (err) {
+            console.error('Error saving settings:', err);
+            alert('Failed to update settings');
+        }
+    };
+
+    // ... (keep creating/deleting handlers)
 
     const handleEdit = (card) => {
         setCurrentCard(card);
@@ -145,7 +168,7 @@ const CardManager = () => {
         if (window.confirm('Are you sure you want to delete this card?')) {
             try {
                 await api.delete(`/cards/${id}`);
-                fetchCards();
+                fetchData();
             } catch (error) {
                 console.error('Error deleting card:', error);
             }
@@ -154,7 +177,7 @@ const CardManager = () => {
 
     const handleSuccess = () => {
         setIsEditing(false);
-        fetchCards();
+        fetchData();
     };
 
     const handleDragStart = (event) => {
@@ -179,7 +202,7 @@ const CardManager = () => {
                 api.post('/cards/reorder', { order: updates })
                     .catch(err => {
                         console.error('Failed to save order', err);
-                        fetchCards();
+                        fetchData();
                     });
 
                 return newOrder;
@@ -205,43 +228,37 @@ const CardManager = () => {
         <div>
             {/* Phase 6: Dimensions UI Upgrade */}
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-8">
-                <h3 className="text-lg font-bold text-gray-800 mb-6 border-b pb-4">Card Dimensions</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Card Width (px)</label>
-                        <input
-                            type="number"
-                            value={dimensions.width}
-                            onChange={(e) => setDimensions({ ...dimensions, width: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                        />
-                        <p className="text-xs text-gray-400 mt-1">Default: 280px</p>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Card Height (px)</label>
-                        <input
-                            type="number"
-                            value={dimensions.height}
-                            onChange={(e) => setDimensions({ ...dimensions, height: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                        />
-                        <p className="text-xs text-gray-400 mt-1">Default: 200px</p>
-                    </div>
+                <h3 className="text-lg font-bold text-gray-800 mb-6 border-b pb-4">Card Settings</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div>
                         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Border Radius (px)</label>
                         <input
                             type="number"
-                            value={dimensions.radius}
-                            onChange={(e) => setDimensions({ ...dimensions, radius: e.target.value })}
+                            value={settings.card_radius}
+                            onChange={(e) => setSettings({ ...settings, card_radius: e.target.value })}
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                         <p className="text-xs text-gray-400 mt-1">Default: 16px</p>
                     </div>
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Image Scroll Speed (pixel/frame)</label>
+                        <input
+                            type="number"
+                            step="0.1"
+                            value={settings.card_scroll_speed}
+                            onChange={(e) => setSettings({ ...settings, card_scroll_speed: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Default: 0.8 (Higher is faster)</p>
+                    </div>
                 </div>
                 <div className="mt-8">
                     <p className="text-xs text-gray-500 mb-4">* These settings apply to all cards on the homepage</p>
-                    <button className="bg-[#1a1f2e] text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow hover:bg-black transition">
-                        UPDATE DIMENSIONS
+                    <button
+                        onClick={handleUpdateSettings}
+                        className="bg-[#1a1f2e] text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow hover:bg-black transition"
+                    >
+                        UPDATE SETTINGS
                     </button>
                 </div>
             </div>

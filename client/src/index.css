@@ -49,3 +49,37 @@
         transform: translateY(0) scale(1);
     }
 }
+
+@layer utilities {
+    .animate-scroll-vertical {
+        animation: scrollVertical 20s linear infinite;
+    }
+
+    .animate-scroll-horizontal {
+        animation: scrollHorizontal 20s linear infinite;
+    }
+
+    .hover\:pause:hover {
+        animation-play-state: paused;
+    }
+}
+
+@keyframes scrollVertical {
+    0% {
+        transform: translateY(-50%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes scrollHorizontal {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}

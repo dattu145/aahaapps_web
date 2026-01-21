@@ -4,20 +4,30 @@ import PublicCard from '../components/PublicCard';
 
 const Home = () => {
     const [cards, setCards] = useState([]);
+    const [settings, setSettings] = useState({ card_radius: '16', card_scroll_speed: '0.8' });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCards = async () => {
+        const fetchData = async () => {
             try {
-                const { data } = await api.get('/cards');
-                setCards(data);
+                const [cardsRes, settingsRes] = await Promise.all([
+                    api.get('/cards'),
+                    api.get('/settings')
+                ]);
+                setCards(cardsRes.data);
+                if (settingsRes.data) {
+                    setSettings({
+                        card_radius: settingsRes.data.card_radius || '16',
+                        card_scroll_speed: settingsRes.data.card_scroll_speed || '0.8'
+                    });
+                }
             } catch (err) {
                 console.error(err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchCards();
+        fetchData();
     }, []);
 
     if (loading) {
@@ -34,7 +44,13 @@ const Home = () => {
 
             <div className="flex flex-col gap-12">
                 {cards.map((card, index) => (
-                    <PublicCard key={card.id} card={card} index={index} />
+                    <PublicCard
+                        key={card.id}
+                        card={card}
+                        index={index}
+                        borderRadius={parseInt(settings.card_radius) || 16}
+                        scrollSpeed={parseFloat(settings.card_scroll_speed) || 0.8}
+                    />
                 ))}
             </div>
 
