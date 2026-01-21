@@ -165,6 +165,16 @@ const PublicCard = ({ card, index = 0 }) => {
         ? JSON.parse(card.buttons)
         : (card.buttons || []);
 
+    const validThumbnails = section1Images.filter(img => img && typeof img === 'string' && img.trim().length > 0);
+    const hasThumbnails = validThumbnails.length > 0;
+
+    const title = card.title ? String(card.title).trim() : '';
+    const description = card.description ? String(card.description).trim() : '';
+
+    const hasContent = title.length > 0 || description.length > 0 || buttons.length > 0;
+
+    const isOnlyMainImage = !hasThumbnails && !hasContent && !!card.section2_image;
+
     const delay = `${index * 150}ms`;
 
     const openGallery = (index) => {
@@ -193,20 +203,22 @@ const PublicCard = ({ card, index = 0 }) => {
                 <div className="hidden lg:grid lg:grid-cols-12 gap-0 h-[500px]">
 
                     {/* Col 1: Vertical Thumbnails Scroll */}
-                    <div className="col-span-2 border-r border-gray-100 overflow-y-auto no-scrollbar p-3 space-y-3 bg-white">
-                        {section1Images.map((img, idx) => (
-                            <div
-                                key={idx}
-                                onClick={() => openGallery(idx)}
-                                className="aspect-[4/3] overflow-hidden rounded-lg cursor-pointer hover:opacity-80 transition border border-transparent hover:border-blue-500 shadow-sm"
-                            >
-                                <img src={`/${img}`} className="w-full h-full object-cover" loading="lazy" />
-                            </div>
-                        ))}
-                    </div>
+                    {!isOnlyMainImage && (
+                        <div className="col-span-2 border-r border-gray-100 overflow-y-auto no-scrollbar p-3 space-y-3 bg-white">
+                            {section1Images.map((img, idx) => (
+                                <div
+                                    key={idx}
+                                    onClick={() => openGallery(idx)}
+                                    className="aspect-[4/3] overflow-hidden rounded-lg cursor-pointer hover:opacity-80 transition border border-transparent hover:border-blue-500 shadow-sm"
+                                >
+                                    <img src={`/${img}`} className="w-full h-full object-cover" loading="lazy" />
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Col 2: Main Image */}
-                    <div className="col-span-6 relative group overflow-hidden bg-gray-50 flex items-center justify-center p-4">
+                    <div className={`${isOnlyMainImage ? 'col-span-12' : 'col-span-6'} relative group overflow-hidden bg-gray-50 flex items-center justify-center p-4`}>
                         {card.section2_image ? (
                             <img
                                 src={`/${card.section2_image}`}
@@ -219,29 +231,31 @@ const PublicCard = ({ card, index = 0 }) => {
                     </div>
 
                     {/* Col 3: Content */}
-                    <div
-                        className="col-span-4 p-10 flex flex-col justify-center relative overflow-hidden bg-white"
-                        style={{ backgroundColor: card.card_bg_color }}
-                    >
-                        <h2
-                            className="text-3xl font-bold mb-4 leading-tight tracking-tight text-gray-900"
-                            style={{ color: card.title_color }}
+                    {!isOnlyMainImage && (
+                        <div
+                            className="col-span-4 p-10 flex flex-col justify-center relative overflow-hidden bg-white"
+                            style={{ backgroundColor: card.card_bg_color }}
                         >
-                            {card.title}
-                        </h2>
-                        <p
-                            className="text-sm text-gray-600 mb-8 leading-relaxed"
-                            style={{ color: card.desc_color }}
-                        >
-                            {card.description}
-                        </p>
+                            <h2
+                                className="text-3xl font-bold mb-4 leading-tight tracking-tight text-gray-900"
+                                style={{ color: card.title_color }}
+                            >
+                                {card.title}
+                            </h2>
+                            <p
+                                className="text-sm text-gray-600 mb-8 leading-relaxed"
+                                style={{ color: card.desc_color }}
+                            >
+                                {card.description}
+                            </p>
 
-                        <div className="grid grid-cols-2 gap-3 mt-auto w-full [&>*:nth-child(odd):last-child]:col-span-2">
-                            {buttons.map((btn, i) => (
-                                <CardButton key={i} btn={btn} isPopup={btn.type === 'popup'} />
-                            ))}
+                            <div className="grid grid-cols-2 gap-3 mt-auto w-full [&>*:nth-child(odd):last-child]:col-span-2">
+                                {buttons.map((btn, i) => (
+                                    <CardButton key={i} btn={btn} isPopup={btn.type === 'popup'} />
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Mobile Layout */}

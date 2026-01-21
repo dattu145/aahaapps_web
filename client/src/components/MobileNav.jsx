@@ -92,12 +92,13 @@ const MobileNav = () => {
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto flex flex-col p-6">
                     {/* Navigation Links */}
-                    <nav className="flex flex-col space-y-6 mb-12">
+                    {/* Navigation Links - Grid Layout */}
+                    <nav className="grid grid-cols-2 gap-4 mb-8">
                         {menus.map(item => (
                             <a
                                 key={item.id}
                                 href={item.url}
-                                className="text-xl font-bold text-gray-800 hover:text-blue-600 transition-colors"
+                                className="flex items-center justify-center text-center px-4 py-3 rounded-xl bg-gray-50 text-gray-800 font-bold hover:bg-blue-50 hover:text-blue-600 transition-all border border-gray-100 shadow-sm text-sm"
                             >
                                 {item.label}
                             </a>
