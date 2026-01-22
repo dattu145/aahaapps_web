@@ -28,15 +28,15 @@ jobs:
           cp -r client/dist/* server/public/
 
       # 4️⃣ Upload backend to cPanel via SCP (SSH)
-      - name: 🚀 Upload files via SCP
+      - name: Upload files via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
+          port: 22
           source: "server/*"
-          target: "/home/${{ secrets.SSH_USERNAME }}/aaha_main_backend_node"
+          target: "/home/mpqprtjm/aaha_main_backend_node"
           strip_components: 1
 
       # 5️⃣ Install dependencies & restart app
