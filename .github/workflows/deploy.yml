@@ -39,8 +39,10 @@ jobs:
           # We deploy the 'server' folder (which now contains the frontend in 'public')
           local-dir: ./server/
           
-          # Destination on cPanel (The folder we created for the backend)
-          server-dir: /aaha_main_backend_node/
+          # Destination on cPanel 
+          # We set this to ./ because we will configure the FTP user 
+          # to land directly inside the 'aaha_main_backend_node' folder.
+          server-dir: ./
           
           # Don't upload node_modules (we install them on server) or .env (security)
           exclude: |
