@@ -1,0 +1,61 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Build React Frontend
+      - name: 📦 Install and Build Client
+        run: |
+          cd client
+          npm install
+          npm run build
+      
+      # 2. Prepare Deployment Package
+      # We move the built frontend files into the server's 'public' folder
+      # so the Node app can serve them (All-In-One Method)
+      - name: 🏗️ Prepare Backend with Frontend assets
+        run: |
+          mkdir -p server/public
+          cp -r client/dist/* server/public/
+          
+      # 3. Deploy to cPanel via FTP
+      - name: 🚀 Deploy to Server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          
+          # We deploy the 'server' folder (which now contains the frontend in 'public')
+          local-dir: ./server/
+          
+          # Destination on cPanel (The folder we created for the backend)
+          server-dir: /aaha_main_backend_node/
+          
+          # Don't upload node_modules (we install them on server) or .env (security)
+          exclude: |
+            **/.git*
+            **/.git*/**
+            node_modules/**
+            .env
+            
+      # 4. Trigger Restart (Create a restart.txt file which Passenger watches)
+      # This is a common trick for cPanel Node apps
+      - name: 🔄 Trigger App Restart
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./server/tmp/
+          server-dir: /aaha_main_backend_node/tmp/

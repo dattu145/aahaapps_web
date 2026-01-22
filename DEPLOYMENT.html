@@ -93,224 +93,85 @@
 
 <body>
 
-    <h1>🚀 AahaApps cPanel Deployment Guide</h1>
+    <h1>🚀 AahaApps Final Deployment Guide (Simplified)</h1>
 
     <div class="note">
-        <strong>Status Update:</strong> Your project uses <strong>MySQL</strong>. I have successfully connected to your
-        Aiven cloud database and exported a complete backup to <code>server/latest_backup.sql</code>. This file contains
-        all your latest schema changes (videos, images, new columns).
+        <strong>Status:</strong> Your site is LIVE! 🟢 <br>
+        We have now added <strong>Automated Deployment (CI/CD)</strong>. This means when you push code to GitHub, it
+        will automatically update your live site.
     </div>
-
-    <p>This guide will walk you through deploying your MERN stack application (MySQL, Express, React, Node) to a
-        standard cPanel hosting environment.</p>
 
     <!-- STEP 1 -->
     <div class="step">
-        <h2><span class="step-number">1.</span> Database Setup (cPanel)</h2>
-        <p>Since we are moving from Aiven (Cloud) to localhost (cPanel), we need to set up the database and import your
-            latest data.</p>
-
-        <h3>A. Create Database & User</h3>
+        <h2><span class="step-number">1.</span> Prepare GitHub Secrets</h2>
+        <p>To let GitHub update your cPanel files, it needs permission. We give it permission using "Secrets".</p>
         <ol>
-            <li>Log in to <strong>cPanel</strong>.</li>
-            <li>Go to <strong>MySQL Database Wizard</strong>.</li>
-            <li><strong>Step 1:</strong> Create a new database (e.g., <code>username_aahaapps</code>).</li>
-            <li><strong>Step 2:</strong> Create a new user (e.g., <code>username_dbuser</code>) and generate a strong
-                password. <strong>Save this password!</strong></li>
-            <li><strong>Step 3:</strong> Grant <strong>ALL PRIVILEGES</strong> to the user for that database.</li>
+            <li>Go to your GitHub Repository page.</li>
+            <li>Click <strong>Settings</strong> (Top right tab).</li>
+            <li>In the left sidebar, scroll down to <strong>Secrets and variables</strong> -> Click
+                <strong>Actions</strong>.</li>
+            <li>Click <strong>New repository secret</strong> (Green button).</li>
+            <li>Add these 3 secrets:</li>
         </ol>
 
-        <h3>B. Import Data</h3>
+        <ul>
+            <li>
+                <strong>Name:</strong> <code>FTP_SERVER</code><br>
+                <strong>Value:</strong> <code>ftp.aahaapps.com</code> (or your cPanel IP address / domain)
+            </li>
+            <li>
+                <strong>Name:</strong> <code>FTP_USERNAME</code><br>
+                <strong>Value:</strong> <code>deployer@aahaapps.com</code> (See Step 1.1 below to create this!)
+            </li>
+            <li>
+                <strong>Name:</strong> <code>FTP_PASSWORD</code><br>
+                <strong>Value:</strong> <em>(The password you set for this FTP user)</em>
+            </li>
+        </ul>
+
+        <h3>Step 1.1: Create the FTP Account</h3>
         <ol>
-            <li>Use the file <strong><code>server/latest_backup.sql</code></strong>. (I created this for you; it is an
-                exact clone of your live Aiven database).</li>
-            <li>Go to <strong>phpMyAdmin</strong> in cPanel.</li>
-            <li>Select your new database on the left.</li>
-            <li>Click <strong>Import</strong> tab -> Choose File -> Select <code>server/latest_backup.sql</code>.</li>
-            <li>Click <strong>Go</strong>.</li>
+            <li>In cPanel, go to <strong>FTP Accounts</strong>.</li>
+            <li><strong>Login:</strong> <code>deployer</code></li>
+            <li><strong>Password:</strong> (Generate a strong one).</li>
+            <li><strong>Directory:</strong> <code>/home/mpqptrjm/</code> <br>
+                <span class="important">CRITICAL: Delete the default text and make sure it is exactly your home root (or
+                    blank). The user needs access to <code>aaha_main_backend_node</code>.</span>
+            </li>
+            <li>Click <strong>Create FTP Account</strong>.</li>
         </ol>
     </div>
 
     <!-- STEP 2 -->
     <div class="step">
-        <h2><span class="step-number">2.</span> Backend Deployment (Node.js)</h2>
-        <p>We will configure the Node.js server to run on cPanel.</p>
-
-        <h3>A. Upload Files</h3>
-        <ol>
-            <li>In cPanel, go to <strong>File Manager</strong>.</li>
-            <li>Create a folder named <code>server</code> in the root directory (<code>/home/username/server</code>) —
-                strictly OUTSIDE <code>public_html</code> for security.</li>
-            <li>Upload all files from your local <code>server/</code> folder to this directory <strong>EXCEPT</strong>
-                <code>node_modules</code>.</li>
-        </ol>
-
-        <h3>B. "Setup Node.js App" in cPanel</h3>
-        <ol>
-            <li>Look for <strong>"Setup Node.js App"</strong> in cPanel (under Software section).</li>
-            <li>Click <strong>Create Application</strong>.</li>
-            <li><strong>Node.js Version:</strong> Select <strong>18.x</strong> or <strong>20.x</strong> (Recommended).
-            </li>
-            <li><strong>Application Mode:</strong> <code>Production</code>.</li>
-            <li><strong>Application Root:</strong> <code>server</code> (the folder you just created).</li>
-            <li><strong>Application Startup File:</strong> <code>server.js</code>.</li>
-            <li>Click <strong>Create</strong>.</li>
-        </ol>
-
-        <h3>C. Install Dependencies & Configure</h3>
-        <ol>
-            <li>Once created, the app page in cPanel will show a command to enter the virtual environment (e.g.,
-                <code>source /home/user/nodevenv/server/20/bin/activate</code>).</li>
-            <li>Copy that command and SSH into your server (or use the <strong>Terminal</strong> inside cPanel).</li>
-            <li>Paste the command to activate the node environment.</li>
-            <li>Run: <code>npm install</code> (This installs dependencies on the server).</li>
-            <li><strong>Environment Variables:</strong>
-                <ul>
-                    <li>In the "Setup Node.js App" UI, click <strong>Environment Variables</strong> (if available) OR
-                        create a <code>.env</code> file inside the <code>server</code> folder.</li>
-                    <li>Update the variables for cPanel:</li>
-                    <pre>
-DB_HOST=localhost
-DB_USER=username_dbuser (Created in Step 1)
-DB_PASSWORD=your_strong_password
-DB_NAME=username_aahaapps
-PORT=3000 (cPanel will verify this internally)
-                    </pre>
-            </li>
-            <li>Restart the application in the Node.js selector UI.</li>
-        </ol>
+        <h2><span class="step-number">2.</span> Push Code to GitHub</h2>
+        <p>I have already created the workflow file for you at <code>.github/workflows/deploy.yml</code>.</p>
+        <p>Now, simply commit and push your code:</p>
+        <pre>
+git add .
+git commit -m "Setup CI/CD deployment to cPanel"
+git push origin main
+        </pre>
+        <p>1. Go to the <strong>Actions</strong> tab in your GitHub repo.</p>
+        <p>2. You will see a new workflow running called <strong>Deploy to cPanel</strong>.</p>
+        <p>3. If it turns Green ✅, your site is updated!</p>
     </div>
 
     <!-- STEP 3 -->
     <div class="step">
-        <h2><span class="step-number">3.</span> Frontend Deployment (React)</h2>
-
-        <h3>A. Build for Production</h3>
-        <p>On your local computer, inside the <code>client</code> folder, run:</p>
-        <pre>npm run build</pre>
-        <p>This creates a <code>dist</code> directory containing your optimized website.</p>
-
-        <h3>B. Upload to public_html</h3>
+        <h2><span class="step-number">3.</span> Future Updates</h2>
+        <p>From now on, whenever you want to update the site:</p>
         <ol>
-            <li>Go to cPanel <strong>File Manager</strong> -> <code>public_html</code>.</li>
-            <li>Clear default files (if empty).</li>
-            <li>Upload the <strong>CONTENTS</strong> of your local <code>client/dist</code> folder here (index.html,
-                assets folder, etc.).</li>
-        </ol>
-
-        <h3>C. Fix Routing (.htaccess)</h3>
-        <p>Since React is a Single Page Application (SPA), we need to tell the server to route all requests to
-            index.html.</p>
-        <ol>
-            <li>In <code>public_html</code>, create or edit the <code>.htaccess</code> file.</li>
-            <li>Add these lines:</li>
+            <li>Make changes on your computer.</li>
+            <li>Testing locally? Run <code>npm run dev</code>.</li>
+            <li>Ready to go live? Just run:</li>
         </ol>
         <pre>
-&lt;IfModule mod_rewrite.c&gt;
-  RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /index.html [L]
-&lt;/IfModule&gt;
+git add .
+git commit -m "Description of changes"
+git push origin main
         </pre>
-    </div>
-
-    <!-- STEP 4 -->
-    <div class="step">
-        <h2><span class="step-number">4.</span> Connecting Frontend to Backend</h2>
-        <p>Your React app needs to know where the API is.</p>
-
-        <ol>
-            <li>In your local code, ensure your API calls (axios/fetch) point to your domain.</li>
-            <li>You typically want the backend running on a subdomain like <code>api.yourdomain.com</code> OR use a
-                proxy.</li>
-            <li><strong>Easiest Method (Subdomain):</strong>
-                <ul>
-                    <li>Create a subdomain <code>api.yourdomain.com</code> in cPanel.</li>
-                    <li>Point your Node.js App (Step 2) to this subdomain document root.</li>
-                    <li>Update your React <code>.env.production</code> (or <code>api.js</code> helper):
-                        <pre>VITE_API_URL=https://api.yourdomain.com</pre>
-                    </li>
-                    <li>Rebuild React (`npm run build`) and re-upload.</li>
-                </ul>
-            </li>
-        </ol>
-    </div>
-
-    <!-- STEP 5 -->
-    <div class="step">
-        <h2><span class="step-number">5.</span> Automation: GitHub Actions</h2>
-        <p>To make code changes reflect automatically on push, use GitHub Actions via FTP.</p>
-
-        <h3>1. Create FTP Account in cPanel</h3>
-        <ul>
-            <li>Go to <strong>FTP Accounts</strong> manually create a dedicated account for deployment (e.g.,
-                <code>deployer@yourdomain.com</code>).</li>
-            <li>Point its root directory to <code>/home/username/</code> (so it can access both `server` and
-                `public_html`).</li>
-        </ul>
-
-        <h3>2. Configure GitHub Secrets</h3>
-        <ul>
-            <li>In your GitHub Repo -> Settings -> Secrets and variables -> Actions.</li>
-            <li>Add: <code>FTP_SERVER</code>, <code>FTP_USERNAME</code>, <code>FTP_PASSWORD</code>.</li>
-        </ul>
-
-        <h3>3. Create Workflow File</h3>
-        <p>Create a file in your project: <code>.github/workflows/deploy.yml</code></p>
-        <pre>
-name: Deploy to cPanel
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  web-deploy:
-    name: 🎉 Deploy
-    runs-on: ubuntu-latest
-    steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
-
-    # 1. Build React
-    - name: 🔨 Install & Build Frontend
-      run: |
-        cd client
-        npm install
-        npm run build
-
-    # 2. Deploy Frontend Files
-    - name: 📂 Sync Frontend Files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./client/dist/
-        server-dir: ./public_html/
-        exclude: |
-          **/.git*
-          **/.git*/**
-
-    # 3. Deploy Backend Files
-    - name: 📂 Sync Backend Files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./server/
-        server-dir: ./server/
-        exclude: |
-          node_modules/
-          .env
-    
-    # Optional: Trigger server restart if you have SSH access configured
-        </pre>
+        <p>GitHub will handle the build, file moving, and upload for you automatically!</p>
     </div>
 
 </body>

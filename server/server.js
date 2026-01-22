@@ -40,11 +40,12 @@ app.use('/api/pages', require('./routes/pageRoutes'));
 
 // Serve static files from client build
 // Serve static files from client build
-app.use(express.static(path.join(__dirname, '../client/dist')));
+// Serve static files from 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Catch-all route to serve React App
 app.get(/(.*)/, (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Server Start
