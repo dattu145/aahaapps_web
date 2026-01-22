@@ -44,6 +44,10 @@ jobs:
           # to land directly inside the 'aaha_main_backend_node' folder.
           server-dir: ./
           
+          # Fix for Timeout / Connection Issues
+          protocol: ftps
+          security: loose
+          
           # Don't upload node_modules (we install them on server) or .env (security)
           exclude: |
             **/.git*
