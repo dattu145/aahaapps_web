@@ -1,0 +1,30 @@
+deploy:
+  # These commands run on your server after each pull
+  steps:
+    - cd /home/mpqptrjm/aaha_git_temp
+    
+    # Install backend dependencies
+    - npm install --production
+    
+    # Build frontend
+    - cd client
+    - npm install
+    - npm run build
+    - cd ..
+    
+    # Create public directory
+    - mkdir -p public
+    
+    # Copy built files to public
+    - cp -r client/dist/* public/
+    
+    # Copy to live directory (exclude sensitive files)
+    - rsync -av --exclude='.git' --exclude='.env' --exclude='node_modules' --exclude='client/node_modules' * /home/mpqptrjm/aaha_main_backend_node/
+    
+    # Restart Node app
+    - cd /home/mpqptrjm/aaha_main_backend_node
+    - mkdir -p tmp
+    - touch tmp/restart.txt
+    
+    # Clean up
+    - echo "Deployment completed successfully!"
