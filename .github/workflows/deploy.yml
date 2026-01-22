@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Deploy to cPanel via SSH
 
 on:
   push:
@@ -10,54 +10,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout code
       - name: 🚚 Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Build React Frontend
+      # 2️⃣ Build React frontend
       - name: 📦 Install and Build Client
         run: |
           cd client
           npm install
           npm run build
-      
-      # 2. Prepare Deployment Package
-      # We move the built frontend files into the server's 'public' folder
-      # so the Node app can serve them (All-In-One Method)
+
+      # 3️⃣ Copy frontend build into backend public folder
       - name: 🏗️ Prepare Backend with Frontend assets
         run: |
           mkdir -p server/public
           cp -r client/dist/* server/public/
-          
-      # 3. Deploy to cPanel via FTP
-      - name: 🚀 Deploy to Server
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+
+      # 4️⃣ Upload backend to cPanel via SCP (SSH)
+      - name: 🚀 Upload files via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          
-          # We deploy the 'server' folder (which now contains the frontend in 'public')
-          local-dir: ./server/
-          
-          # Destination on cPanel 
-          # We set this to ./ because we will configure the FTP user 
-          # to land directly inside the 'aaha_main_backend_node' folder.
-          server-dir: ./
-          
-          # Don't upload node_modules (we install them on server) or .env (security)
-          exclude: |
-            **/.git*
-            **/.git*/**
-            node_modules/**
-            .env
-            
-      # 4. Trigger Restart (Create a restart.txt file which Passenger watches)
-      # This is a common trick for cPanel Node apps
-      - name: 🔄 Trigger App Restart
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "server/*"
+          target: "/home/${{ secrets.SSH_USERNAME }}/aaha_main_backend_node"
+          strip_components: 1
+
+      # 5️⃣ Install dependencies & restart app
+      - name: 🔄 Install deps & Restart Node App
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./server/tmp/
-          server-dir: /aaha_main_backend_node/tmp/
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ~/aaha_main_backend_node
+            npm install --production
+            mkdir -p tmp
+            touch tmp/restart.txt
