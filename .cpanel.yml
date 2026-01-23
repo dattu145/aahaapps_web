@@ -2,27 +2,19 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/mpqptrjm/aahaapps_testing
 
-    # ----------------------------
-    # Build frontend
-    # ----------------------------
+    - echo "=== Building frontend ==="
     - cd $DEPLOYPATH/client
     - npm install
     - npm run build
 
-    # ----------------------------
-    # Move build to server/public
-    # ----------------------------
+    - echo "=== Copying build to server/public ==="
     - rm -rf $DEPLOYPATH/server/public
     - mkdir -p $DEPLOYPATH/server/public
-    - cp -R dist/* $DEPLOYPATH/server/public/
+    - cp -R $DEPLOYPATH/client/dist/* $DEPLOYPATH/server/public/
 
-    # ----------------------------
-    # Install backend dependencies
-    # ----------------------------
+    - echo "=== Installing backend deps ==="
     - cd $DEPLOYPATH/server
     - npm install
 
-    # ----------------------------
-    # Restart Node app
-    # ----------------------------
+    - echo "=== Restarting Node app ==="
     - touch $DEPLOYPATH/server/tmp/restart.txt

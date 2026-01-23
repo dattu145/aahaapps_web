@@ -53,7 +53,15 @@ app.use(express.static(publicDir));
 
 // SPA fallback
 app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(publicDir, 'index.html'));
+    const indexPath = path.join(publicDir, 'index.html');
+
+    if (!fs.existsSync(indexPath)) {
+        return res
+          .status(500)
+          .send('Frontend build missing. Please redeploy.');
+    }
+
+    res.sendFile(indexPath);
 });
 
 /* ================================
