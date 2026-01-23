@@ -21,10 +21,19 @@ const PORT = process.env.PORT || 3000;
 /* ================================
    Ensure uploads directory exists
 ================================ */
-const uploadDir = path.join(process.cwd(), 'uploads');
+// On cPanel/Passenger, process.cwd() might be the root of the user or the app root
+// We explicitly define it relative to THIS file (__dirname is server/ or server/something)
+const uploadDir = path.join(__dirname, 'uploads');
+
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-    console.log('Created uploads directory');
+    console.log('Creating uploads directory at:', uploadDir);
+    try {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    } catch (e) {
+        console.error('Failed to create uploads dir:', e);
+    }
+} else {
+    console.log('Uploads directory exists at:', uploadDir);
 }
 
 /* ================================
