@@ -8,8 +8,6 @@ coverage
 
 # Production
 build
-dist
-/client/dist
 
 # Misc
 .DS_Store

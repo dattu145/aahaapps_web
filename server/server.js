@@ -48,6 +48,26 @@ app.use('/api/pages', require('./routes/pageRoutes'));
    Serve React (Vite) build
 ================================ */
 const publicDir = path.join(process.cwd(), 'public');
+console.log('Serving static files from:', publicDir);
+
+try {
+    if (fs.existsSync(publicDir)) {
+        console.log('Public dir contents:', fs.readdirSync(publicDir));
+    } else {
+        console.warn('Public dir does NOT exist!');
+    }
+} catch (err) {
+    console.error('Error checking public dir:', err);
+}
+
+// Add CSP header to allow content
+app.use((req, res, next) => {
+    res.setHeader(
+        "Content-Security-Policy",
+        "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'"
+    );
+    next();
+});
 
 app.use(express.static(publicDir));
 
@@ -56,9 +76,10 @@ app.get(/.*/, (req, res) => {
     const indexPath = path.join(publicDir, 'index.html');
 
     if (!fs.existsSync(indexPath)) {
+        console.error('Index file missing at:', indexPath);
         return res
-          .status(500)
-          .send('Frontend build missing. Please redeploy.');
+            .status(500)
+            .send('Frontend build missing. Please redeploy.');
     }
 
     res.sendFile(indexPath);

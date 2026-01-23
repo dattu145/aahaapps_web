@@ -2,10 +2,7 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/mpqptrjm/aahaapps_testing
 
-    - echo "=== Building frontend ==="
-    - cd $DEPLOYPATH/client
-    - npm install
-    - npm run build
+    - echo "=== Using pre-built frontend (client/dist) ==="
 
     - echo "=== Copying build to server/public ==="
     - rm -rf $DEPLOYPATH/server/public
