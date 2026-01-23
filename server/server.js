@@ -11,44 +11,54 @@ const cardRoutes = require('./routes/cardRoutes');
 const settingRoutes = require('./routes/settingRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 const userRoutes = require('./routes/userRoutes');
+
 const fs = require('fs');
 const path = require('path');
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, 'uploads');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+/* ================================
+   Ensure uploads directory exists
+================================ */
+const uploadDir = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
     console.log('Created uploads directory');
 }
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware
+/* ================================
+   Middleware
+================================ */
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use('/uploads', express.static(uploadDir));
 
-// Routes
+/* ================================
+   API Routes
+================================ */
 app.use('/api/cards', cardRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/menus', menuRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/pages', require('./routes/pageRoutes'));
 
+/* ================================
+   Serve React (Vite) build
+================================ */
+const publicDir = path.join(process.cwd(), 'public');
 
-// Serve static files from client build
-// Serve static files from client build
-// Serve static files from 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(publicDir));
 
-// Catch-all route to serve React App
-app.get(/(.*)/, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
+// SPA fallback
+app.get('*', (req, res) => {
+    res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-// Server Start
+/* ================================
+   Start server
+================================ */
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

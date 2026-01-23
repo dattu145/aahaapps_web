@@ -1,0 +1,22 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/mpqptrjm/aaha_main_backend_node
+
+    # Go to project root
+    - cd $DEPLOYPATH
+
+    # Install backend dependencies
+    - npm install
+
+    # Build frontend
+    - cd client
+    - npm install
+    - npm run build
+
+    # Replace public folder with fresh build
+    - rm -rf $DEPLOYPATH/public
+    - mkdir -p $DEPLOYPATH/public
+    - cp -R dist/* $DEPLOYPATH/public/
+
+    # Restart Node app (Passenger / Node App)
+    - touch $DEPLOYPATH/tmp/restart.txt
