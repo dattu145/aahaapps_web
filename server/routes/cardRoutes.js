@@ -10,6 +10,7 @@ const uploadFields = upload.fields([
 ]);
 
 router.get('/', cardController.getCards);
+router.get('/:id', cardController.getCardById);
 router.post('/', uploadFields, cardController.createCard);
 router.put('/:id', uploadFields, cardController.updateCard);
 router.post('/reorder', cardController.reorderCards);
