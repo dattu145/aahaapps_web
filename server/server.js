@@ -52,7 +52,7 @@ const publicDir = path.join(process.cwd(), 'public');
 app.use(express.static(publicDir));
 
 // SPA fallback
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(publicDir, 'index.html'));
 });
 
