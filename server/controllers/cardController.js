@@ -24,14 +24,18 @@ exports.getCards = async (req, res) => {
 
 // Get single card by ID
 exports.getCardById = async (req, res) => {
+    console.log(`[getCardById] Request for ID: ${req.params.id}`);
     try {
         const card = await Card.findById(req.params.id);
+        console.log(`[getCardById] Found card:`, card ? 'Yes' : 'No');
+
         if (!card) {
             return res.status(404).json({ message: 'Card not found' });
         }
         res.json(card);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error(`[getCardById] Error:`, error);
+        res.status(500).json({ message: error.message, stack: error.stack });
     }
 };
 
