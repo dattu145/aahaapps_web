@@ -9,9 +9,5 @@ deployment:
     - mkdir -p $DEPLOYPATH/server/public
     - cp -R $DEPLOYPATH/client/dist/* $DEPLOYPATH/server/public/
 
-    - echo "=== Installing backend deps ==="
-    - cd $DEPLOYPATH/server
-    - npm install
-
     - echo "=== Restarting Node app ==="
     - touch $DEPLOYPATH/server/tmp/restart.txt
