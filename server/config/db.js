@@ -20,9 +20,9 @@ const dbConfig = {
     connectionLimit: 10,
     queueLimit: 0,
     multipleStatements: true, // Required for executing SQL dumps
-    ssl: {
-        rejectUnauthorized: false // Required for Aiven/Cloud SQL
-    }
+    // ssl: {
+    //     rejectUnauthorized: false // Required for Aiven/Cloud SQL
+    // }
 };
 
 const pool = mysql.createPool(dbConfig);

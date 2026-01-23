@@ -109,21 +109,23 @@ exports.sendVerificationOtp = async (req, res) => {
     // Store OTP in memory (valid for 10 mins)
     otpStore.set(email, { otp, expires: Date.now() + 10 * 60000 });
 
-    try {
-        await emailService.sendEmail(
-            email,
-            `Verification OTP for ${action}`,
-            `<p>Your OTP is: <strong>${otp}</strong></p><p>This code is valid for 10 minutes.</p>`
-        );
-        res.json({ success: true, message: 'OTP sent successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Failed to send email. Check server logs.' });
-    }
+    // DISABLED BREVO EMAIL SERVICE AS REQUESTED
+    // try {
+    //     await emailService.sendEmail(
+    //         email,
+    //         `Verification OTP for ${action}`,
+    //         `<p>Your OTP is: <strong>${otp}</strong></p><p>This code is valid for 10 minutes.</p>`
+    //     );
+    res.json({ success: true, message: 'OTP Generated (Check Console/Logs) - Email Service Disabled' });
+    // } catch (error) {
+    //     console.error(error);
+    //     res.status(500).json({ message: 'Failed to send email. Check server logs.' });
+    // }
 };
 
 // Verify OTP
 exports.verifyOtp = async (req, res) => {
+    // Bypass OTP check if user wants (optional). For now, we will verify the logged OTP.
     const email = req.user.email;
     const { otp } = req.body;
 
