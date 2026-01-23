@@ -75,29 +75,32 @@ exports.createCard = async (req, res) => {
 
 // Update a card
 exports.updateCard = async (req, res) => {
+    console.log(`[updateCard] Request for ID: ${req.params.id}`);
     try {
-
         const card = await Card.findById(req.params.id);
         if (!card) {
+            console.log(`[updateCard] Card not found`);
             return res.status(404).json({ message: 'Card not found' });
         }
 
+        console.log(`[updateCard] Processing update data...`);
         let { section1_images, section2_image, section2_video, buttons, video_options, ...otherFields } = req.body;
 
         // 1. Handle Section 2 Main Image
-        if (req.files['section2_image'] && req.files['section2_image'][0]) {
+        if (req.files && req.files['section2_image'] && req.files['section2_image'][0]) {
+            console.log(`[updateCard] Updating section2_image`);
             // New file uploaded, delete old one
             deleteFile(card.section2_image);
             section2_image = `uploads/${req.files['section2_image'][0].filename}`;
-        } else {
-            // Keep existing (handled by default pass-through of undefined or explicitly handled below)
         }
 
         // 1b. Handle Section 2 Video
-        if (req.files['section2_video'] && req.files['section2_video'][0]) {
+        if (req.files && req.files['section2_video'] && req.files['section2_video'][0]) {
+            console.log(`[updateCard] Updating section2_video`);
             deleteFile(card.section2_video);
             section2_video = `uploads/${req.files['section2_video'][0].filename}`;
         } else if (section2_video === 'DELETE') {
+            console.log(`[updateCard] Deleting section2_video`);
             deleteFile(card.section2_video);
             section2_video = null;
         } else {
@@ -119,14 +122,18 @@ exports.updateCard = async (req, res) => {
         }
 
         // Add new uploaded files
-        if (req.files['section1_images']) {
+        if (req.files && req.files['section1_images']) {
+            console.log(`[updateCard] Adding ${req.files['section1_images'].length} new section1_images`);
             const newFilePaths = req.files['section1_images'].map(file => `uploads/${file.filename}`);
             updatedSection1Images = [...updatedSection1Images, ...newFilePaths];
         }
 
         const oldImages = card.section1_images || [];
         const imagesToDelete = oldImages.filter(img => !updatedSection1Images.includes(img));
-        imagesToDelete.forEach(img => deleteFile(img));
+        imagesToDelete.forEach(img => {
+            // Check if file exists in updatedSection1Images (duplicates?)
+            if (!updatedSection1Images.includes(img)) deleteFile(img)
+        });
 
 
         // 3. Handle Buttons & Video Options
@@ -147,12 +154,15 @@ exports.updateCard = async (req, res) => {
             buttons: buttons || card.buttons
         };
 
+        console.log(`[updateCard] Executing DB update...`);
         await Card.update(req.params.id, updateData);
+        console.log(`[updateCard] DB update success.`);
 
         const updatedCard = await Card.findById(req.params.id);
         res.json(updatedCard);
 
     } catch (error) {
+        console.error(`[updateCard] Crash/Error:`, error);
         res.status(400).json({ message: error.message });
     }
 };
