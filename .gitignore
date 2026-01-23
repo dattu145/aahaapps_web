@@ -29,3 +29,5 @@ yarn-error.log*
 !/server/uploads/.gitkeep
 /server/database.sqlite
 Learn.html
+server/server.zip
+client/dist/dist.zip
