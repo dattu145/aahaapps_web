@@ -56,7 +56,7 @@ app.use('/api/pages', require('./routes/pageRoutes'));
 /* ================================
    Serve React (Vite) build
 ================================ */
-const publicDir = path.join(process.cwd(), 'public');
+const publicDir = path.join(__dirname, 'public');
 console.log('Serving static files from:', publicDir);
 
 try {
