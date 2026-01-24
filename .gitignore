@@ -29,3 +29,6 @@ yarn-error.log*
 Learn.html
 server/server.zip
 client/dist/dist.zip
+server/output.log
+server/server.log
+server/tmp/restart.txt
