@@ -10,7 +10,7 @@ const Home = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log("APP VERSION: 1.2 (Path Fixed)");
+            console.log("APP VERSION: 1.3 (Relative Paths)");
             try {
                 const [cardsRes, bannersRes, settingsRes] = await Promise.all([
                     api.get('/cards'),

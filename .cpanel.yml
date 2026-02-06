@@ -1,21 +1,21 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/mpqptrjm/repositories/aahaapps_web
+    - /bin/echo "--- STARTING DEPLOYMENT FROM $(pwd) ---"
     
-    # 1. Install Server Dependencies (Production only)
-    - echo "=== Installing Server Dependencies ==="
-    - cd $DEPLOYPATH/server && npm install --production
-
-    # 2. Deploy Frontend Build (Copy dist to server/public)
-    - echo "=== Copying client/dist to server/public ==="
-    - /bin/rm -rf $DEPLOYPATH/server/public
-    - /bin/mkdir -p $DEPLOYPATH/server/public
-    - /bin/cp -R $DEPLOYPATH/client/dist/* $DEPLOYPATH/server/public/
+    # 1. Install Server Dependencies
+    - cd server && npm install --production
+    
+    # 2. Deploy Frontend Build (Relative Paths)
+    # We remove the old public folder and copy the new dist folder content
+    - /bin/rm -rf server/public
+    - /bin/mkdir -p server/public
+    - /bin/cp -R client/dist/* server/public/
 
     # 3. Ensure Uploads Directory Exists
-    - echo "=== specific uploads folder check ==="
-    - /bin/mkdir -p $DEPLOYPATH/server/uploads
+    - /bin/mkdir -p server/uploads
 
     # 4. Restart Node App
-    - echo "=== Restarting Node app ==="
-    - /bin/touch $DEPLOYPATH/server/tmp/restart.txt
+    - /bin/mkdir -p server/tmp
+    - /bin/touch server/tmp/restart.txt
+    
+    - /bin/echo "--- DEPLOYMENT COMPLETE ---"
