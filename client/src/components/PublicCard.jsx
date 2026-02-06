@@ -214,7 +214,7 @@ const PublicCard = ({ card, index = 0, borderRadius = 16, scrollSpeed = 0.8 }) =
         ? JSON.parse(card.buttons)
         : (card.buttons || []);
 
-    const validThumbnails = section1Images.filter(img => img && typeof img === 'string' && img.trim().length > 0);
+    const validThumbnails = Array.isArray(section1Images) ? section1Images.filter(img => img && typeof img === 'string' && img.trim().length > 0) : [];
     const hasThumbnails = validThumbnails.length > 0;
 
     const title = card.title ? String(card.title).trim() : '';
@@ -391,7 +391,7 @@ const PublicCard = ({ card, index = 0, borderRadius = 16, scrollSpeed = 0.8 }) =
                         >
                             {/* We loop 3 times to ensure plenty of scroll space for smooth resetting */}
                             <div className="space-y-3 p-3 pb-0">
-                                {[...section1Images, ...section1Images, ...section1Images].map((img, idx) => (
+                                {[...(Array.isArray(section1Images) ? section1Images : []), ...(Array.isArray(section1Images) ? section1Images : []), ...(Array.isArray(section1Images) ? section1Images : [])].map((img, idx) => (
                                     <div
                                         key={`desk-${idx}`}
                                         onClick={(e) => {
@@ -475,7 +475,7 @@ const PublicCard = ({ card, index = 0, borderRadius = 16, scrollSpeed = 0.8 }) =
                     >
                         {/* 3x Loop */}
                         <div className="flex p-4 gap-3 pr-0">
-                            {[...section1Images, ...section1Images, ...section1Images].map((img, idx) => (
+                            {[...(Array.isArray(section1Images) ? section1Images : []), ...(Array.isArray(section1Images) ? section1Images : []), ...(Array.isArray(section1Images) ? section1Images : [])].map((img, idx) => (
                                 <div
                                     key={`mob-${idx}`}
                                     onClick={(e) => {
