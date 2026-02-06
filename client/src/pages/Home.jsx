@@ -1,20 +1,55 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
 import PublicCard from '../components/PublicCard';
+import BannerSection from '../components/BannerSection';
 
 const Home = () => {
-    const [cards, setCards] = useState([]);
+    const [contentItems, setContentItems] = useState([]);
     const [settings, setSettings] = useState({ card_radius: '16', card_scroll_speed: '0.8' });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [cardsRes, settingsRes] = await Promise.all([
+                const [cardsRes, bannersRes, settingsRes] = await Promise.all([
                     api.get('/cards'),
+                    api.get('/banners'),
                     api.get('/settings')
                 ]);
-                setCards(cardsRes.data);
+
+                const cards = cardsRes.data || [];
+                const banners = bannersRes.data || [];
+
+                // --- Merge Logic ---
+                const finalItems = [];
+
+                // 1. Top Banners
+                const topBanners = banners.filter(b => b.placement === 'top' && b.is_active);
+                topBanners.forEach(b => finalItems.push({ type: 'banner', data: b }));
+
+                // 2. Relative Banners (indexed by card ID)
+                const relativeBanners = banners.filter(b => b.placement === 'relative' && b.is_active);
+
+                // 3. Process Cards and Relative Banners
+                cards.forEach(card => {
+                    // Check for 'before' banners
+                    const before = relativeBanners.filter(b => b.target_card_id === card.id && b.relative_position === 'before');
+                    before.forEach(b => finalItems.push({ type: 'banner', data: b }));
+
+                    // Add Card
+                    finalItems.push({ type: 'card', data: card });
+
+                    // Check for 'after' banners
+                    const after = relativeBanners.filter(b => b.target_card_id === card.id && b.relative_position === 'after');
+                    after.forEach(b => finalItems.push({ type: 'banner', data: b }));
+                });
+
+                // 4. Bottom Banners
+                const bottomBanners = banners.filter(b => b.placement === 'bottom' && b.is_active);
+                bottomBanners.forEach(b => finalItems.push({ type: 'banner', data: b }));
+
+                setContentItems(finalItems);
+
                 if (settingsRes.data) {
                     setSettings({
                         card_radius: settingsRes.data.card_radius || '16',
@@ -38,23 +73,32 @@ const Home = () => {
         );
     }
 
+    // Track card index separately to maintain alternating layout consistency
+    let cardIndexCounter = 0;
+
     return (
         <div className="space-y-12">
-
-
             <div className="flex flex-col gap-12">
-                {cards.map((card, index) => (
-                    <PublicCard
-                        key={card.id}
-                        card={card}
-                        index={index}
-                        borderRadius={parseInt(settings.card_radius) || 16}
-                        scrollSpeed={parseFloat(settings.card_scroll_speed) || 0.8}
-                    />
-                ))}
+                {contentItems.map((item, index) => {
+                    if (item.type === 'banner') {
+                        return <BannerSection key={`banner-${item.data.id}-${index}`} banner={item.data} />;
+                    } else {
+                        // Card
+                        const currentCardIndex = cardIndexCounter++;
+                        return (
+                            <PublicCard
+                                key={`card-${item.data.id}`}
+                                card={item.data}
+                                index={currentCardIndex}
+                                borderRadius={parseInt(settings.card_radius) || 16}
+                                scrollSpeed={parseFloat(settings.card_scroll_speed) || 0.8}
+                            />
+                        );
+                    }
+                })}
             </div>
 
-            {cards.length === 0 && (
+            {contentItems.length === 0 && (
                 <div className="text-center text-gray-400 py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
                     <p className="text-xl">No content available at the moment.</p>
                 </div>

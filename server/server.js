@@ -52,6 +52,7 @@ app.use('/api/settings', settingRoutes);
 app.use('/api/menus', menuRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/pages', require('./routes/pageRoutes'));
+app.use('/api/banners', require('./routes/bannerRoutes'));
 
 /* ================================
    Serve React (Vite) build

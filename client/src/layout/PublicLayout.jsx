@@ -5,7 +5,7 @@ import MobileNav from '../components/MobileNav';
 
 const PublicLayout = () => {
     return (
-        <div className="relative min-h-screen text-gray-900 bg-white">
+        <div className="relative min-h-screen text-gray-900 bg-white overflow-x-hidden">
             {/* Video Background */}
             <div className="fixed inset-0 z-0">
                 <div className="absolute inset-0 bg-white/60 z-10" /> {/* Light Overlay */}

@@ -14,6 +14,7 @@ const AdminLayout = () => {
         { label: 'Menus', path: '/admin/menus' },
         { label: 'Pages', path: '/admin/pages' },
         { label: 'Home Page Cards', path: '/admin/cards' },
+        { label: 'Banners', path: '/admin/banners' },
         { label: 'Settings', path: '/admin/settings' },
     ];
 

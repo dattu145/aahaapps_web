@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import CardManager from './pages/CardManager';
 import MenuManager from './pages/MenuManager';
 import SettingsManager from './pages/SettingsManager';
+import BannerManager from './pages/BannerManager';
 import Home from './pages/Home';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
@@ -37,6 +38,7 @@ function App() {
             <Route path="pages/create" element={<PageForm />} />
             <Route path="pages/:id" element={<PageForm />} />
             <Route path="settings" element={<SettingsManager />} />
+            <Route path="banners" element={<BannerManager />} />
             <Route path="profile" element={<Profile />} />
 
           </Route>
