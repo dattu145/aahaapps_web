@@ -10,6 +10,7 @@ const Home = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            console.log("APP VERSION: 1.1 (Fix Loaded)");
             try {
                 const [cardsRes, bannersRes, settingsRes] = await Promise.all([
                     api.get('/cards'),
