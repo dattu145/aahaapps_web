@@ -17,8 +17,8 @@ const Home = () => {
                     api.get('/settings')
                 ]);
 
-                const cards = cardsRes.data || [];
-                const banners = bannersRes.data || [];
+                const cards = Array.isArray(cardsRes.data) ? cardsRes.data : [];
+                const banners = Array.isArray(bannersRes.data) ? bannersRes.data : [];
 
                 // --- Merge Logic ---
                 const finalItems = [];
