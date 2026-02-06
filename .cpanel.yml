@@ -1,6 +1,6 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/mpqptrjm/aahaapps_main
+    - export DEPLOYPATH=/home/mpqptrjm/repositories/aahaapps_web
     
     # 1. Install Server Dependencies (Production only)
     - echo "=== Installing Server Dependencies ==="
